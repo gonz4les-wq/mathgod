@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"
+  />
+  <meta name="description" content="A calm, minimal multiplication practice app for daily learning." />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f0f12" media="(prefers-color-scheme: dark)" />
+
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Mathgod" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+  <link rel="stylesheet" href="./style.css" />
+
+  <title>Mathgod — Multiplication Practice</title>
+</head>
+<body>
+  <div id="app" class="app">
+
+    <!-- ──────────────────────────────  HOME  ────────────────────────────── -->
+    <section class="view view--home" data-view="home" aria-label="Home">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__name">Mathgod</span>
+        </div>
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path class="icon-sun" d="M12 4V2M12 22v-2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            <circle class="icon-sun" cx="12" cy="12" r="4"/>
+            <path class="icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </header>
+
+      <main class="home">
+        <div class="home__intro">
+          <h1 class="home__title">Practice<br/>every day.</h1>
+          <p class="home__subtitle">Short, focused sessions to master your times tables.</p>
+        </div>
+
+        <div class="stats-row" id="homeStats">
+          <div class="stat">
+            <span class="stat__value" data-stat="xp">0</span>
+            <span class="stat__label">XP</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value" data-stat="streak">0</span>
+            <span class="stat__label">Best streak</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value" data-stat="sessions">0</span>
+            <span class="stat__label">Sessions</span>
+          </div>
+        </div>
+
+        <div class="modes">
+          <button class="mode-card" data-mode="1x1" type="button">
+            <div class="mode-card__row">
+              <span class="mode-card__title">Single digit</span>
+              <span class="mode-card__chip">1 × 1</span>
+            </div>
+            <span class="mode-card__hint">2 – 9 × 2 – 9</span>
+            <div class="mode-card__bar"><span class="mode-card__fill" data-fill="1x1"></span></div>
+          </button>
+
+          <button class="mode-card" data-mode="1x2" type="button">
+            <div class="mode-card__row">
+              <span class="mode-card__title">Mixed</span>
+              <span class="mode-card__chip">1 × 2</span>
+            </div>
+            <span class="mode-card__hint">2 – 9 × 10 – 20</span>
+            <div class="mode-card__bar"><span class="mode-card__fill" data-fill="1x2"></span></div>
+          </button>
+
+          <button class="mode-card" data-mode="2x2" type="button">
+            <div class="mode-card__row">
+              <span class="mode-card__title">Double digit</span>
+              <span class="mode-card__chip">2 × 2</span>
+            </div>
+            <span class="mode-card__hint">10 – 20 × 10 – 20</span>
+            <div class="mode-card__bar"><span class="mode-card__fill" data-fill="2x2"></span></div>
+          </button>
+        </div>
+
+        <p class="home__footer">Sessions are 10 questions. Pick a mode to begin.</p>
+      </main>
+    </section>
+
+    <!-- ──────────────────────────────  GAME  ────────────────────────────── -->
+    <section class="view view--game" data-view="game" hidden aria-label="Practice">
+      <header class="topbar">
+        <button class="icon-btn" id="quitBtn" aria-label="Back to home" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <div class="game-meta">
+          <span class="streak" id="streakBadge" aria-label="Current streak">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+              <path d="M13.5 0.67c.74 3.06 3.5 5.3 3.5 9.2A6.5 6.5 0 0 1 5 12.3c0-2.83 1.5-5 3-7.3.62 1 1.5 1.6 2.5 1.6 0-2-1.5-3.6 0-5.93l3 0z"/>
+            </svg>
+            <span data-streak>0</span>
+          </span>
+        </div>
+        <div class="progress" aria-label="Session progress">
+          <div class="progress__track">
+            <div class="progress__fill" id="progressFill"></div>
+          </div>
+        </div>
+      </header>
+
+      <main class="game">
+        <div class="question-card" id="questionCard">
+          <div class="question" aria-live="polite">
+            <span class="question__a" id="qA">0</span>
+            <span class="question__x" aria-hidden="true">×</span>
+            <span class="question__b" id="qB">0</span>
+          </div>
+          <div class="answer">
+            <span class="answer__value" id="answerValue" aria-live="polite">&nbsp;</span>
+            <span class="answer__caret" aria-hidden="true"></span>
+          </div>
+          <div class="feedback" id="feedback" aria-live="polite"></div>
+        </div>
+
+        <div class="keypad" id="keypad" role="group" aria-label="Numeric keypad">
+          <button class="key" data-key="1" type="button">1</button>
+          <button class="key" data-key="2" type="button">2</button>
+          <button class="key" data-key="3" type="button">3</button>
+          <button class="key" data-key="4" type="button">4</button>
+          <button class="key" data-key="5" type="button">5</button>
+          <button class="key" data-key="6" type="button">6</button>
+          <button class="key" data-key="7" type="button">7</button>
+          <button class="key" data-key="8" type="button">8</button>
+          <button class="key" data-key="9" type="button">9</button>
+          <button class="key key--util" data-key="back" type="button" aria-label="Delete">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 5H8.5a2 2 0 0 0-1.6.8L2 12l4.9 6.2a2 2 0 0 0 1.6.8H21a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/>
+              <path d="M18 9l-6 6M12 9l6 6"/>
+            </svg>
+          </button>
+          <button class="key" data-key="0" type="button">0</button>
+          <button class="key key--enter" data-key="enter" type="button" aria-label="Submit">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12l5 5L20 7"/>
+            </svg>
+          </button>
+        </div>
+      </main>
+    </section>
+
+    <!-- ────────────────────────────  SUMMARY  ──────────────────────────── -->
+    <section class="view view--summary" data-view="summary" hidden aria-label="Session summary">
+      <header class="topbar">
+        <div class="brand"><span class="brand__name">Session</span></div>
+      </header>
+      <main class="summary">
+        <div class="summary__hero">
+          <div class="summary__emoji" id="summaryEmoji" aria-hidden="true">✦</div>
+          <h2 class="summary__title" id="summaryTitle">Nice work.</h2>
+          <p class="summary__subtitle" id="summarySubtitle">Here's how this session went.</p>
+        </div>
+
+        <div class="summary__stats">
+          <div class="summary__stat">
+            <span class="summary__num" id="sumCorrect">0</span>
+            <span class="summary__lbl">Correct</span>
+          </div>
+          <div class="summary__stat">
+            <span class="summary__num" id="sumStreak">0</span>
+            <span class="summary__lbl">Best streak</span>
+          </div>
+          <div class="summary__stat">
+            <span class="summary__num" id="sumXP">0</span>
+            <span class="summary__lbl">XP earned</span>
+          </div>
+        </div>
+
+        <div class="summary__actions">
+          <button class="btn btn--primary" id="againBtn" type="button">Practice again</button>
+          <button class="btn btn--ghost" id="homeBtn" type="button">Back home</button>
+        </div>
+      </main>
+    </section>
+
+    <!-- ───────────────────────────  ONBOARDING  ────────────────────────── -->
+    <section class="view view--onboard" data-view="onboard" hidden aria-label="Welcome">
+      <main class="onboard">
+        <div class="onboard__mark" aria-hidden="true"></div>
+        <h2 class="onboard__title">Welcome to Mathgod</h2>
+        <p class="onboard__text">
+          Practice multiplication in calm, focused sessions.
+          The app learns which questions trip you up and brings them back more often.
+        </p>
+        <ul class="onboard__list">
+          <li><b>10 questions</b> per session.</li>
+          <li><b>Streaks &amp; XP</b> track your daily practice.</li>
+          <li><b>Offline-ready</b> — add to Home Screen for the full experience.</li>
+        </ul>
+        <button class="btn btn--primary" id="onboardStart" type="button">Get started</button>
+      </main>
+    </section>
+
+  </div>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
