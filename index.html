@@ -52,6 +52,13 @@
           <p class="home__subtitle">Short, focused sessions to master your times tables.</p>
         </div>
 
+        <div class="seg" id="gameTypeSeg" role="tablist" aria-label="Game type">
+          <button class="seg__btn is-active" data-gametype="practice" type="button" role="tab" aria-selected="true">Practice</button>
+          <button class="seg__btn" data-gametype="survival" type="button" role="tab" aria-selected="false">Survival</button>
+          <button class="seg__btn" data-gametype="sprint" type="button" role="tab" aria-selected="false">Sprint</button>
+        </div>
+        <p class="seg__hint" id="gameTypeHint">Ten questions, then a summary.</p>
+
         <div class="stats-row" id="homeStats">
           <div class="stat">
             <span class="stat__value" data-stat="xp">0</span>
@@ -74,6 +81,7 @@
               <span class="mode-card__chip">1 × 1</span>
             </div>
             <span class="mode-card__hint">2 – 9 × 2 – 9</span>
+            <span class="mode-card__best" data-best="1x1"></span>
             <div class="mode-card__bar"><span class="mode-card__fill" data-fill="1x1"></span></div>
           </button>
 
@@ -83,6 +91,7 @@
               <span class="mode-card__chip">1 × 2</span>
             </div>
             <span class="mode-card__hint">2 – 9 × 10 – 20</span>
+            <span class="mode-card__best" data-best="1x2"></span>
             <div class="mode-card__bar"><span class="mode-card__fill" data-fill="1x2"></span></div>
           </button>
 
@@ -92,11 +101,10 @@
               <span class="mode-card__chip">2 × 2</span>
             </div>
             <span class="mode-card__hint">10 – 20 × 10 – 20</span>
+            <span class="mode-card__best" data-best="2x2"></span>
             <div class="mode-card__bar"><span class="mode-card__fill" data-fill="2x2"></span></div>
           </button>
         </div>
-
-        <p class="home__footer">Sessions are 10 questions. Pick a mode to begin.</p>
       </main>
     </section>
 
@@ -117,11 +125,12 @@
             <span data-streak>0</span>
           </span>
         </div>
-        <div class="progress" aria-label="Session progress">
+        <div class="progress" id="progressWrap" aria-label="Session progress">
           <div class="progress__track">
             <div class="progress__fill" id="progressFill"></div>
           </div>
         </div>
+        <span class="timer" id="timerBadge" hidden aria-live="off">1:00</span>
       </header>
 
       <main class="game">
@@ -178,10 +187,14 @@
           <p class="summary__subtitle" id="summarySubtitle">Here's how this session went.</p>
         </div>
 
-        <div class="summary__stats">
+        <div class="summary__stats summary__stats--grid">
           <div class="summary__stat">
             <span class="summary__num" id="sumCorrect">0</span>
             <span class="summary__lbl">Correct</span>
+          </div>
+          <div class="summary__stat">
+            <span class="summary__num" id="sumTime">0:00</span>
+            <span class="summary__lbl">Time</span>
           </div>
           <div class="summary__stat">
             <span class="summary__num" id="sumStreak">0</span>
@@ -192,6 +205,8 @@
             <span class="summary__lbl">XP earned</span>
           </div>
         </div>
+
+        <p class="summary__best" id="summaryBest" hidden></p>
 
         <div class="summary__actions">
           <button class="btn btn--primary" id="againBtn" type="button">Practice again</button>

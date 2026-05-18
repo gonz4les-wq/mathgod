@@ -3,14 +3,28 @@
 A calm, minimal multiplication practice app for iPhone Safari.
 Vanilla HTML / CSS / JS. Installable as a PWA. Works fully offline.
 
-## Modes
+## Difficulties
 
 - **1 × 1** — single-digit, factors `2 – 9 × 2 – 9`
 - **1 × 2** — mixed, factors `2 – 9 × 10 – 20`
 - **2 × 2** — double-digit, factors `10 – 20 × 10 – 20`
 
-Each session is 10 questions. Questions you get wrong reappear more often
-(adaptive weighting per `(a, b)` pair stored in `localStorage`).
+Questions you get wrong reappear more often (adaptive weighting per
+`(a, b)` pair stored in `localStorage`).
+
+## Game types
+
+Selectable from the segmented control on the home screen:
+
+- **Practice** — 10 questions, then a summary with your time. Best time per
+  difficulty is tracked.
+- **Survival** — open-ended; one wrong answer ends the run. Longest streak
+  per difficulty is tracked.
+- **Sprint** — 60-second timer; solve as many as you can. Highest score per
+  difficulty is tracked.
+
+Each summary shows correct / time / best streak / XP, and a "new personal
+best" badge whenever you beat the relevant record.
 
 ## Run locally
 
