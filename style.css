@@ -1196,6 +1196,430 @@ ul { padding: 0; list-style: none; }
 .toast__title { font-size: 13px; font-weight: 700; letter-spacing: -0.005em; }
 .toast__desc  { font-size: 12px; color: var(--text-soft); }
 
+/* ─────────────────────────────  Theme packs  ──────────────────────────── */
+/* Each pack overrides design tokens. Default is the base palette declared
+   at the top of this file. Picked via [data-theme-pack="…"] on the root. */
+:root[data-theme-pack="sunset"] {
+  --bg: #fff7ed;
+  --surface: #fffaf2;
+  --surface-2: #fdebd5;
+  --border: rgba(120, 60, 20, 0.10);
+  --text: #2a1610;
+  --text-soft: #6b4a3a;
+  --text-muted: #a07a66;
+  --accent: #f97316;
+  --accent-soft: rgba(249, 115, 22, 0.14);
+  --accent-ink: #ffffff;
+}
+:root[data-theme-pack="ocean"] {
+  --bg: #ecfeff;
+  --surface: #ffffff;
+  --surface-2: #d6f3f7;
+  --border: rgba(8, 60, 80, 0.10);
+  --text: #0e2a33;
+  --text-soft: #336978;
+  --text-muted: #79a3ad;
+  --accent: #0891b2;
+  --accent-soft: rgba(8, 145, 178, 0.14);
+  --accent-ink: #ffffff;
+}
+:root[data-theme-pack="sakura"] {
+  --bg: #fff1f5;
+  --surface: #ffffff;
+  --surface-2: #ffe3ec;
+  --border: rgba(200, 60, 100, 0.10);
+  --text: #281319;
+  --text-soft: #74415a;
+  --text-muted: #b88b9d;
+  --accent: #ec4899;
+  --accent-soft: rgba(236, 72, 153, 0.12);
+  --accent-ink: #ffffff;
+}
+:root[data-theme-pack="forest"] {
+  --bg: #f3f7ec;
+  --surface: #ffffff;
+  --surface-2: #e6efd6;
+  --border: rgba(60, 90, 30, 0.10);
+  --text: #122014;
+  --text-soft: #495c3e;
+  --text-muted: #8aa276;
+  --accent: #16a34a;
+  --accent-soft: rgba(22, 163, 74, 0.14);
+  --accent-ink: #ffffff;
+}
+/* Neon and Retro LCD are inherently dark. */
+:root[data-theme-pack="neon"] {
+  --bg: #08081a;
+  --surface: #11132b;
+  --surface-2: #1a1d3c;
+  --border: rgba(244, 114, 182, 0.12);
+  --text: #f1f1ff;
+  --text-soft: #c0c0e8;
+  --text-muted: #7c7ca0;
+  --accent: #f472b6;
+  --accent-soft: rgba(244, 114, 182, 0.18);
+  --accent-ink: #08081a;
+}
+:root[data-theme-pack="retroLcd"] {
+  --bg: #0a1408;
+  --surface: #102a10;
+  --surface-2: #173917;
+  --border: rgba(132, 204, 22, 0.12);
+  --text: #d9f99d;
+  --text-soft: #a3d96a;
+  --text-muted: #6c9c46;
+  --accent: #84cc16;
+  --accent-soft: rgba(132, 204, 22, 0.18);
+  --accent-ink: #0a1408;
+  /* LCD theme also flips number style to monospace for full effect. */
+}
+:root[data-theme-pack="retroLcd"] .question__slot,
+:root[data-theme-pack="retroLcd"] .answer__value,
+:root[data-theme-pack="retroLcd"] .key {
+  font-family: "Menlo", "SF Mono", "Courier New", monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ─────────────────────────  Number style packs  ───────────────────────── */
+:root[data-number-style="mono"] .question__slot,
+:root[data-number-style="mono"] .answer__value,
+:root[data-number-style="mono"] .key {
+  font-family: "Menlo", "SF Mono", "Courier New", monospace;
+}
+:root[data-number-style="serif"] .question__slot,
+:root[data-number-style="serif"] .answer__value,
+:root[data-number-style="serif"] .key {
+  font-family: "New York", "Georgia", "Times New Roman", serif;
+  font-feature-settings: "lnum";
+}
+:root[data-number-style="display"] .question__slot,
+:root[data-number-style="display"] .answer__value {
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+/* ───────────────────────────  Card style packs  ───────────────────────── */
+:root[data-card-style="outlined"] .question-card {
+  background: transparent;
+  border: 2px solid var(--border);
+  box-shadow: none;
+}
+:root[data-card-style="glow"] .question-card {
+  box-shadow:
+    0 0 60px rgba(99, 102, 241, 0.18),
+    0 0 20px rgba(99, 102, 241, 0.10),
+    var(--shadow-md);
+}
+:root[data-card-style="glow"] .question-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(60% 80% at 50% 0%, var(--accent-soft), transparent 70%);
+  opacity: 0.6;
+}
+
+/* ─────────────────────────  Keypad style packs  ───────────────────────── */
+:root[data-keypad-style="sharp"] .key { border-radius: 6px; }
+:root[data-keypad-style="soft"]  .key { border-radius: 22px; }
+
+/* ──────────────────────────────  Shop view  ───────────────────────────── */
+.view--shop .topbar { gap: 12px; align-items: center; }
+.view--shop .icon-btn { margin-left: 0; }
+.view--shop .brand__name { font-size: 16px; font-weight: 600; }
+.shop-balance {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  padding: 4px 10px;
+  background: var(--accent-soft);
+  border-radius: 999px;
+  transition: transform 200ms var(--ease);
+}
+.shop-balance.nope {
+  animation: shake 360ms var(--ease-out);
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-4px); }
+  50%      { transform: translateX(4px); }
+  75%      { transform: translateX(-2px); }
+}
+
+.shop { display: grid; gap: 16px; padding-top: 8px; }
+.shop-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0 4px 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.shop-tabs::-webkit-scrollbar { display: none; }
+.shop-tab {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  transition: background 200ms var(--ease), color 200ms var(--ease);
+}
+.shop-tab.is-active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: transparent;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.shop-item {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.shop-item::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--rarity-color, transparent);
+}
+.shop-item.rarity-common    { --rarity-color: #94a3b8; }
+.shop-item.rarity-rare      { --rarity-color: #38bdf8; }
+.shop-item.rarity-epic      { --rarity-color: #a78bfa; }
+.shop-item.rarity-legendary { --rarity-color: linear-gradient(90deg, #fbbf24, #f97316, #ec4899); }
+.shop-item.rarity-legendary::before { background: var(--rarity-color); }
+.shop-item.is-owned { opacity: 1; }
+
+.shop-item__preview {
+  height: 92px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  position: relative;
+}
+.shop-item__body { display: grid; gap: 8px; }
+.shop-item__row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.shop-item__name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.shop-item__rarity {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.rarity-common    .shop-item__rarity { color: #64748b; }
+.rarity-rare      .shop-item__rarity { color: #0284c7; }
+.rarity-epic      .shop-item__rarity { color: #7c3aed; }
+.rarity-legendary .shop-item__rarity { color: #ea580c; }
+
+.shop-item__cta {
+  height: 36px;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  transition: transform 160ms var(--ease), background 200ms var(--ease), color 200ms var(--ease);
+}
+.shop-item__cta:active { transform: scale(0.97); }
+.shop-item__cta.is-buy {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.shop-item__cta.is-buy.is-locked {
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.shop-item__cta.is-equip {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.shop-item__cta.is-equipped {
+  background: var(--success-soft);
+  color: var(--success);
+  cursor: default;
+}
+.shop-item__price { font-variant-numeric: tabular-nums; }
+
+/* Previews */
+.preview-swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  width: calc(100% - 16px);
+}
+.preview-swatch {
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.preview-number {
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.preview-number[data-number-preview="mono"]    { font-family: "Menlo", "SF Mono", monospace; }
+.preview-number[data-number-preview="serif"]   { font-family: "New York", "Georgia", serif; font-feature-settings: "lnum"; }
+.preview-number[data-number-preview="display"] { font-weight: 800; letter-spacing: -0.05em; }
+
+.preview-card {
+  width: 80px; height: 56px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+.preview-card--outlined {
+  background: transparent;
+  border-width: 2px;
+  box-shadow: none;
+}
+.preview-card--glow {
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.30), var(--shadow-sm);
+}
+
+.preview-particles {
+  position: relative;
+  width: 100%; height: 100%;
+}
+.preview-dot {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: var(--c);
+  top: 50%; left: 50%;
+  animation: previewPop 2.4s var(--ease-out) infinite;
+  animation-delay: calc(var(--i) * 0.18s);
+  opacity: 0;
+}
+@keyframes previewPop {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; transform:
+           translate(calc(-50% + var(--dx, 18px)), calc(-50% + var(--dy, -22px))) scale(1); }
+  100% { opacity: 0; transform:
+           translate(calc(-50% + var(--dx, 18px)), calc(-50% + var(--dy, -22px))) scale(0.8); }
+}
+.preview-dot:nth-child(1) { --dx: -22px; --dy: -16px; }
+.preview-dot:nth-child(2) { --dx:  22px; --dy: -16px; }
+.preview-dot:nth-child(3) { --dx: -28px; --dy:  12px; }
+.preview-dot:nth-child(4) { --dx:  28px; --dy:  12px; }
+.preview-dot:nth-child(5) { --dx:   0px; --dy: -24px; }
+.preview-dot:nth-child(6) { --dx:   0px; --dy:  20px; }
+
+.preview-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: calc(100% - 24px);
+}
+.preview-keypad span {
+  height: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r, 10px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Prestige box at the bottom of the shop view. */
+.prestige-box {
+  margin-top: 10px;
+  padding: 14px;
+  background: linear-gradient(160deg, #fbbf24, #ec4899);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  display: grid;
+  gap: 12px;
+  box-shadow: 0 10px 28px rgba(236, 72, 153, 0.20);
+}
+.prestige-box__title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.prestige-box__desc {
+  font-size: 13px;
+  opacity: 0.95;
+  line-height: 1.35;
+}
+.prestige-box .btn--primary {
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* ────────────────────────────  Particles  ─────────────────────────────── */
+/* Generated by JS on correct answers; positioned absolutely on the card. */
+.particle {
+  position: absolute;
+  left: 0; top: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: particleFly 800ms var(--ease-out) forwards;
+}
+@keyframes particleFly {
+  0%   { transform: translate(var(--x0), var(--y0)) rotate(0deg) scale(0.6); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(calc(var(--x0) + var(--dx)),
+                              calc(var(--y0) + var(--dy)))
+                    rotate(var(--rot)) scale(1);
+         opacity: 0; }
+}
+.particle--sparkle {
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #fff, rgba(255,255,255,0));
+  box-shadow: 0 0 8px var(--accent);
+}
+.particle--confetti {
+  width: 8px; height: 4px;
+  border-radius: 2px;
+  background: var(--c, var(--accent));
+}
+.particle--stars {
+  width: 10px; height: 10px;
+  background: transparent;
+  /* Five-pointed star via clip-path. */
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+                     50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  background: linear-gradient(180deg, #fde047, #f59e0b);
+}
+
 /* ────────────────────────────  Reduced motion  ─────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

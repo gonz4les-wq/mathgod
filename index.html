@@ -42,6 +42,13 @@
             <div class="level-badge__fill" id="levelFill"></div>
           </div>
         </div>
+        <button class="icon-btn" id="shopBtn" aria-label="Shop" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 7h14l-1.2 11.1A2 2 0 0 1 15.8 20H8.2a2 2 0 0 1-2-1.9L5 7z"/>
+            <path d="M8 7V5a4 4 0 0 1 8 0v2"/>
+          </svg>
+        </button>
         <button class="icon-btn" id="achievementsBtn" aria-label="Achievements" type="button">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -296,6 +303,37 @@
         <div class="summary__actions">
           <button class="btn btn--primary" id="againBtn" type="button">Practice again</button>
           <button class="btn btn--ghost" id="homeBtn" type="button">Back home</button>
+        </div>
+      </main>
+    </section>
+
+    <!-- ─────────────────────────────  SHOP  ─────────────────────────────── -->
+    <section class="view view--shop" data-view="shop" hidden aria-label="Shop">
+      <header class="topbar">
+        <button class="icon-btn" id="shopBackBtn" aria-label="Back" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <span class="brand__name">Shop</span>
+        <span class="shop-balance" id="shopBalance" aria-live="polite">0 XP</span>
+      </header>
+      <main class="shop">
+        <div class="shop-tabs" id="shopTabs" role="tablist" aria-label="Shop categories">
+          <button class="shop-tab is-active" data-cat="theme" type="button" role="tab">Themes</button>
+          <button class="shop-tab" data-cat="numberStyle" type="button" role="tab">Numbers</button>
+          <button class="shop-tab" data-cat="cardStyle" type="button" role="tab">Card</button>
+          <button class="shop-tab" data-cat="particles" type="button" role="tab">Particles</button>
+          <button class="shop-tab" data-cat="keypadStyle" type="button" role="tab">Keypad</button>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+        <div class="prestige-box" id="prestigeBox" hidden>
+          <div class="prestige-box__body">
+            <p class="prestige-box__title">Prestige unlocked</p>
+            <p class="prestige-box__desc">Reset your XP for a permanent <b>+5% XP</b> multiplier. Cosmetics and progress stay.</p>
+          </div>
+          <button class="btn btn--primary" id="prestigeBtn" type="button">Prestige ★</button>
         </div>
       </main>
     </section>

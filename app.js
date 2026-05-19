@@ -79,6 +79,57 @@
   const FEEDBACK_CORRECT = ["Nice.", "Got it.", "Clean.", "Sharp.", "Smooth."];
   const FEEDBACK_WRONG   = (a, b) => `${a} × ${b} = ${a * b}`;
 
+  /* ─────────────────────────────  Shop catalog  ─────────────────────────
+     Each item belongs to a category (theme / numberStyle / cardStyle /
+     particles / keypadStyle). The "default" item per category is always
+     owned and equipped, and is free / not visible in the shop.
+     Items declare an `apply` hook that mutates the document root via a
+     data-* attribute, which CSS rules pick up. Particles are JS-only and
+     handled directly in `triggerCorrectParticles()`.
+     Rarity tiers control accent colour and price tiers:
+        common 200–500 · rare 800–1500 · epic 2500–3500 · legendary 8000
+  ────────────────────────────────────────────────────────────────────── */
+  const RARITY_ORDER = { common: 0, rare: 1, epic: 2, legendary: 3 };
+  const CATEGORIES = [
+    { id: "theme",       label: "Themes",   attr: "data-theme-pack"   },
+    { id: "numberStyle", label: "Numbers",  attr: "data-number-style" },
+    { id: "cardStyle",   label: "Card",     attr: "data-card-style"   },
+    { id: "particles",   label: "Particles", attr: null /* JS only */ },
+    { id: "keypadStyle", label: "Keypad",   attr: "data-keypad-style" },
+  ];
+
+  const ITEMS = [
+    // ─── Themes ───────────────────────────────────────────────────────────
+    { id: "theme:default",  category: "theme", name: "Indigo",     rarity: "common",    price: 0,    value: "default", preview: { kind: "swatch", colors: ["#6366f1", "#8b5cf6", "#f6f5f1", "#15151a"] } },
+    { id: "theme:sunset",   category: "theme", name: "Sunset",     rarity: "common",    price: 200,  value: "sunset",  preview: { kind: "swatch", colors: ["#f97316", "#ef4444", "#fde68a", "#1e1b18"] } },
+    { id: "theme:ocean",    category: "theme", name: "Ocean",      rarity: "common",    price: 300,  value: "ocean",   preview: { kind: "swatch", colors: ["#0891b2", "#06b6d4", "#ecfeff", "#0f1e24"] } },
+    { id: "theme:sakura",   category: "theme", name: "Sakura",     rarity: "rare",      price: 800,  value: "sakura",  preview: { kind: "swatch", colors: ["#ec4899", "#f9a8d4", "#fff1f5", "#2a1820"] } },
+    { id: "theme:forest",   category: "theme", name: "Forest",     rarity: "rare",      price: 800,  value: "forest",  preview: { kind: "swatch", colors: ["#16a34a", "#65a30d", "#f1f5e7", "#152017"] } },
+    { id: "theme:neon",     category: "theme", name: "Neon",       rarity: "epic",      price: 2500, value: "neon",    preview: { kind: "swatch", colors: ["#f472b6", "#22d3ee", "#0a0a14", "#f1f1ff"] } },
+    { id: "theme:retroLcd", category: "theme", name: "Retro LCD",  rarity: "legendary", price: 8000, value: "retroLcd", preview: { kind: "swatch", colors: ["#84cc16", "#65a30d", "#0a1408", "#d9f99d"] } },
+    // ─── Number styles ────────────────────────────────────────────────────
+    { id: "numberStyle:default", category: "numberStyle", name: "Default",  rarity: "common",  price: 0,    value: "default", preview: { kind: "number", style: "default" } },
+    { id: "numberStyle:mono",    category: "numberStyle", name: "Monospace", rarity: "common", price: 400,  value: "mono",    preview: { kind: "number", style: "mono" } },
+    { id: "numberStyle:serif",   category: "numberStyle", name: "Serif",    rarity: "rare",    price: 1000, value: "serif",   preview: { kind: "number", style: "serif" } },
+    { id: "numberStyle:display", category: "numberStyle", name: "Display",  rarity: "epic",    price: 2500, value: "display", preview: { kind: "number", style: "display" } },
+    // ─── Card styles ──────────────────────────────────────────────────────
+    { id: "cardStyle:default",  category: "cardStyle", name: "Default",   rarity: "common", price: 0,    value: "default",  preview: { kind: "card", style: "default" } },
+    { id: "cardStyle:outlined", category: "cardStyle", name: "Outlined",  rarity: "common", price: 500,  value: "outlined", preview: { kind: "card", style: "outlined" } },
+    { id: "cardStyle:glow",     category: "cardStyle", name: "Glow",      rarity: "epic",   price: 3000, value: "glow",     preview: { kind: "card", style: "glow" } },
+    // ─── Particles ────────────────────────────────────────────────────────
+    { id: "particles:default",  category: "particles", name: "None",      rarity: "common",    price: 0,    value: "default" },
+    { id: "particles:sparkle",  category: "particles", name: "Sparkle",   rarity: "rare",      price: 1500, value: "sparkle"  },
+    { id: "particles:confetti", category: "particles", name: "Confetti",  rarity: "epic",      price: 3500, value: "confetti" },
+    { id: "particles:stars",    category: "particles", name: "Stars",     rarity: "legendary", price: 8000, value: "stars"    },
+    // ─── Keypad ───────────────────────────────────────────────────────────
+    { id: "keypadStyle:default", category: "keypadStyle", name: "Default", rarity: "common", price: 0,    value: "default" },
+    { id: "keypadStyle:sharp",   category: "keypadStyle", name: "Sharp",   rarity: "common", price: 300,  value: "sharp"   },
+    { id: "keypadStyle:soft",    category: "keypadStyle", name: "Soft",    rarity: "rare",   price: 800,  value: "soft"    },
+  ];
+
+  const ITEM_BY_ID = Object.fromEntries(ITEMS.map((it) => [it.id, it]));
+  const PRESTIGE_THRESHOLD_LEVEL = 25;
+
   /* Achievements: id → metadata + unlock predicate evaluated after a session. */
   const ACHIEVEMENTS = [
     { id: "first",        emoji: "✦", name: "First steps",       desc: "Finish your first session.",
@@ -132,6 +183,17 @@
       lastSeenLevel: 1,   // for detecting level-ups
       prestige: 0,        // increments on prestige reset
     },
+    shop: {
+      owned: {},          // itemId -> true
+      equipped: {
+        theme:        "default",
+        numberStyle:  "default",
+        cardStyle:    "default",
+        particles:    "default",
+        keypadStyle:  "default",
+      },
+      featured: { date: null, ids: [] },
+    },
   });
 
   /* ─────────────────────────────  Levels  ───────────────────────────────── */
@@ -161,15 +223,23 @@
       if (!raw) return defaults();
       const parsed = JSON.parse(raw);
       const d = defaults();
-      // Shallow merge plus careful sub-object merges.
+      // Shallow merge plus careful sub-object merges so new fields land safely.
       return {
         ...d,
         ...parsed,
         mastery: parsed.mastery || {},
         records: parsed.records || {},
         achievements: parsed.achievements || {},
-        daily: { ...d.daily, ...(parsed.daily || {}) },
-        tried: { ...d.tried, ...(parsed.tried || {}) },
+        daily:  { ...d.daily,  ...(parsed.daily  || {}) },
+        tried:  { ...d.tried,  ...(parsed.tried  || {}) },
+        player: { ...d.player, ...(parsed.player || {}) },
+        shop:   {
+          ...d.shop,
+          ...(parsed.shop || {}),
+          owned:    { ...(parsed.shop?.owned    || {}) },
+          equipped: { ...d.shop.equipped, ...(parsed.shop?.equipped || {}) },
+          featured: { ...d.shop.featured, ...(parsed.shop?.featured || {}) },
+        },
       };
     } catch {
       return defaults();
@@ -435,7 +505,17 @@
     levelBadge:    $("#levelBadge"),
     levelNum:      $("#levelNum"),
     levelFill:     $("#levelFill"),
+    shopBtn:       $("#shopBtn"),
+    shopBackBtn:   $("#shopBackBtn"),
+    shopBalance:   $("#shopBalance"),
+    shopTabs:      $("#shopTabs"),
+    shopGrid:      $("#shopGrid"),
+    prestigeBox:   $("#prestigeBox"),
+    prestigeBtn:   $("#prestigeBtn"),
   };
+
+  // Includes the shop view alongside the existing ones.
+  views.shop = $('[data-view="shop"]');
 
   function showView(name) {
     Object.entries(views).forEach(([k, el]) => {
@@ -500,6 +580,226 @@
     // Highlight the chip whenever the user has diverged from the defaults.
     const modified = store.gameType !== "practice" || store.reverseMode;
     dom.prefsBtn.classList.toggle("is-modified", modified);
+  }
+
+  /* ───────────────────────────────  Shop  ───────────────────────────────── */
+
+  /** Re-apply all equipped cosmetics to the document root. Called on load
+   *  and after every equip change. */
+  function applyEquipment() {
+    const root = document.documentElement;
+    for (const cat of CATEGORIES) {
+      if (!cat.attr) continue;
+      const value = store.shop.equipped[cat.id];
+      if (!value || value === "default") root.removeAttribute(cat.attr);
+      else root.setAttribute(cat.attr, value);
+    }
+  }
+
+  /** Returns true if the user owns an item (defaults are implicitly owned). */
+  function isOwned(item) {
+    if (item.price === 0) return true;
+    return !!store.shop.owned[item.id];
+  }
+
+  /** Returns true if the item is the currently equipped one in its category. */
+  function isEquipped(item) {
+    return store.shop.equipped[item.category] === item.value;
+  }
+
+  function equipItem(item) {
+    if (!isOwned(item)) return;
+    store.shop.equipped[item.category] = item.value;
+    applyEquipment();
+    saveStore();
+    renderShop();
+  }
+
+  function buyItem(item) {
+    if (isOwned(item)) return;
+    if (store.totalXP < item.price) {
+      // Bounce the balance to signal "not enough".
+      dom.shopBalance?.classList.remove("nope");
+      void dom.shopBalance?.offsetWidth;
+      dom.shopBalance?.classList.add("nope");
+      return;
+    }
+    store.totalXP -= item.price;
+    store.shop.owned[item.id] = true;
+    // First purchase in a category? Auto-equip the new item.
+    if (store.shop.equipped[item.category] === "default") {
+      store.shop.equipped[item.category] = item.value;
+      applyEquipment();
+    }
+    saveStore();
+    renderShop();
+    renderLevelBadge();
+    queueToast({
+      emoji: rarityEmoji(item.rarity),
+      name: `Unlocked · ${item.name}`,
+      desc: `Tap "Equip" to apply.`,
+    });
+  }
+
+  function rarityEmoji(r) {
+    return r === "legendary" ? "★" : r === "epic" ? "✦" : r === "rare" ? "◆" : "•";
+  }
+
+  /* The shop view: tabs across the top, then a grid of item cards. */
+  let shopCategory = "theme";
+
+  function openShop() {
+    shopCategory = "theme";
+    renderShop();
+    showView("shop");
+  }
+  function closeShop() { goHome(); }
+
+  function renderShop() {
+    if (!dom.shopGrid) return;
+    // Balance.
+    dom.shopBalance.textContent = `${formatCount(store.totalXP)} XP`;
+    // Tabs.
+    $$(".shop-tab", dom.shopTabs).forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.cat === shopCategory);
+      btn.setAttribute("aria-selected", btn.dataset.cat === shopCategory ? "true" : "false");
+    });
+    // Items in this category, sorted by rarity then price (defaults last).
+    const items = ITEMS
+      .filter((it) => it.category === shopCategory && it.price > 0)
+      .slice()
+      .sort((a, b) =>
+        (RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]) || (a.price - b.price)
+      );
+    dom.shopGrid.innerHTML = "";
+    for (const it of items) {
+      dom.shopGrid.appendChild(buildShopCard(it));
+    }
+    // Prestige box visible when the user has reached the threshold.
+    const prestigeReady = levelFromXP(store.totalXP) >= PRESTIGE_THRESHOLD_LEVEL;
+    if (dom.prestigeBox) dom.prestigeBox.hidden = !prestigeReady;
+  }
+
+  function buildShopCard(item) {
+    const owned = isOwned(item);
+    const equipped = isEquipped(item);
+    const affordable = store.totalXP >= item.price;
+    const card = document.createElement("div");
+    card.className = `shop-item rarity-${item.rarity}` + (owned ? " is-owned" : "");
+    card.innerHTML = `
+      <div class="shop-item__preview">${buildPreview(item)}</div>
+      <div class="shop-item__body">
+        <div class="shop-item__row">
+          <span class="shop-item__name">${item.name}</span>
+          <span class="shop-item__rarity">${item.rarity}</span>
+        </div>
+        ${owned
+          ? `<button class="shop-item__cta ${equipped ? "is-equipped" : "is-equip"}" data-action="equip" data-id="${item.id}">
+               ${equipped ? "Equipped" : "Equip"}
+             </button>`
+          : `<button class="shop-item__cta is-buy ${affordable ? "" : "is-locked"}" data-action="buy" data-id="${item.id}">
+               <span class="shop-item__price">${item.price} XP</span>
+             </button>`
+        }
+      </div>
+    `;
+    return card;
+  }
+
+  /** Build category-specific preview markup. */
+  function buildPreview(item) {
+    const p = item.preview;
+    if (!p) {
+      // For particles & keypad, render a small symbolic preview.
+      if (item.category === "particles") {
+        const dotColors = item.value === "stars" ? ["#fbbf24", "#f59e0b"]
+                        : item.value === "confetti" ? ["#f472b6", "#22d3ee", "#a78bfa"]
+                        : item.value === "sparkle" ? ["#a78bfa"]
+                        : ["transparent"];
+        const dots = Array.from({ length: 6 }).map((_, i) => {
+          const c = dotColors[i % dotColors.length];
+          return `<span class="preview-dot" style="--c:${c};--i:${i}"></span>`;
+        }).join("");
+        return `<div class="preview-particles">${dots}</div>`;
+      }
+      if (item.category === "keypadStyle") {
+        const r = item.value === "soft" ? "18px" : item.value === "sharp" ? "4px" : "10px";
+        return `<div class="preview-keypad">
+          <span style="--r:${r}"></span><span style="--r:${r}"></span><span style="--r:${r}"></span>
+        </div>`;
+      }
+      return "";
+    }
+    if (p.kind === "swatch") {
+      return `<div class="preview-swatches">${
+        p.colors.map((c) => `<span class="preview-swatch" style="background:${c}"></span>`).join("")
+      }</div>`;
+    }
+    if (p.kind === "number") {
+      return `<div class="preview-number" data-number-preview="${p.style}">42</div>`;
+    }
+    if (p.kind === "card") {
+      return `<div class="preview-card preview-card--${p.style}"><span>7×8</span></div>`;
+    }
+    return "";
+  }
+
+  /* ─────────────────────────  Particle effects  ─────────────────────────── */
+
+  /** Emit particles on the question card based on the equipped pack. */
+  function triggerCorrectParticles() {
+    const style = store.shop?.equipped?.particles;
+    if (!style || style === "default") return;
+    const host = dom.questionCard;
+    if (!host) return;
+    const rect = host.getBoundingClientRect();
+    const cx = rect.width / 2;
+    const cy = rect.height / 2 - 30;
+    const count = style === "stars" ? 10 : style === "confetti" ? 14 : 8;
+
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement("span");
+      p.className = `particle particle--${style}`;
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+      const dist = 60 + Math.random() * 60;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist * 0.6 - 20;
+      p.style.setProperty("--x0", `${cx}px`);
+      p.style.setProperty("--y0", `${cy}px`);
+      p.style.setProperty("--dx", `${dx}px`);
+      p.style.setProperty("--dy", `${dy}px`);
+      p.style.setProperty("--rot", `${Math.random() * 360}deg`);
+      // Random tint for confetti.
+      if (style === "confetti") {
+        const palette = ["#f472b6", "#22d3ee", "#a78bfa", "#fbbf24", "#34d399"];
+        p.style.setProperty("--c", palette[Math.floor(Math.random() * palette.length)]);
+      }
+      host.appendChild(p);
+      setTimeout(() => p.remove(), 900);
+    }
+  }
+
+  /* ─────────────────────────────  Prestige  ─────────────────────────────── */
+
+  function performPrestige() {
+    if (levelFromXP(store.totalXP) < PRESTIGE_THRESHOLD_LEVEL) return;
+    // Reset XP. Keep mastery, achievements, shop, story.
+    store.player.prestige = (store.player.prestige || 0) + 1;
+    store.totalXP = 0;
+    store.player.lastSeenLevel = 1;
+    saveStore();
+    renderShop();
+    renderLevelBadge({ bump: true });
+    queueToast({
+      emoji: "★",
+      name: `Prestige ${store.player.prestige}`,
+      desc: "Permanent +5% XP bonus from now on.",
+    });
+  }
+
+  /** Multiplier applied to XP gains based on prestige tier. */
+  function prestigeMultiplier() {
+    return 1 + 0.05 * (store.player.prestige || 0);
   }
 
   /* ─────────────────────────────  Sheet  ────────────────────────────────── */
@@ -724,13 +1024,15 @@
                         : session.streak >= COMBO_TIER_1 ? 1
                         : 0;
       const multiplier = session.comboTier === 2 ? 3 : session.comboTier === 1 ? 2 : 1;
-      const gained = (XP_PER_CORRECT + Math.min(session.streak, 10) * XP_STREAK_BONUS) * multiplier;
+      const baseGain = (XP_PER_CORRECT + Math.min(session.streak, 10) * XP_STREAK_BONUS) * multiplier;
+      const gained = Math.round(baseGain * prestigeMultiplier());
       session.xp += gained;
       dom.answer.classList.add("is-correct");
       dom.feedback.textContent = pick(FEEDBACK_CORRECT);
       dom.feedback.classList.add("is-correct");
       dom.questionCard.classList.add("flash-correct");
       renderStreak(true);
+      triggerCorrectParticles();
       haptic(8);
     } else {
       session.wrong += 1;
@@ -1147,6 +1449,24 @@
     });
     dom.achBack?.addEventListener("click", () => showView("home"));
 
+    dom.shopBtn?.addEventListener("click", openShop);
+    dom.shopBackBtn?.addEventListener("click", closeShop);
+    dom.shopTabs?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".shop-tab");
+      if (!btn) return;
+      shopCategory = btn.dataset.cat;
+      renderShop();
+    });
+    dom.shopGrid?.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      const item = ITEM_BY_ID[btn.dataset.id];
+      if (!item) return;
+      if (btn.dataset.action === "buy")   buyItem(item);
+      else if (btn.dataset.action === "equip") equipItem(item);
+    });
+    dom.prestigeBtn?.addEventListener("click", performPrestige);
+
     dom.prefsBtn?.addEventListener("click", openPrefsSheet);
     dom.prefsSheet?.addEventListener("click", (e) => {
       if (e.target.matches("[data-sheet-close]")) closePrefsSheet();
@@ -1205,6 +1525,7 @@
 
   function init() {
     applyTheme();
+    applyEquipment();
     renderGameType();
     renderReverseToggle();
     renderHomeStats();
