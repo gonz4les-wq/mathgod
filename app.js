@@ -128,7 +128,32 @@
       lastPlayedDate: null,
     },
     tried: { gameTypes: [], reverse: false, daily: false },
+    player: {
+      lastSeenLevel: 1,   // for detecting level-ups
+      prestige: 0,        // increments on prestige reset
+    },
   });
+
+  /* ─────────────────────────────  Levels  ───────────────────────────────── */
+
+  /** XP required to be at the start of `level` (level 1 starts at 0). */
+  function xpForLevel(level) { return 25 * (level - 1) * level; }
+
+  /** The player's current level derived from total XP. */
+  function levelFromXP(xp) {
+    if (!Number.isFinite(xp) || xp <= 0) return 1;
+    return Math.max(1, Math.floor((1 + Math.sqrt(1 + 4 * xp / 25)) / 2));
+  }
+
+  /** { level, current, needed, pct } — progress through the current level. */
+  function levelProgress() {
+    const level = levelFromXP(store.totalXP);
+    const lo = xpForLevel(level);
+    const hi = xpForLevel(level + 1);
+    const current = Math.max(0, store.totalXP - lo);
+    const needed  = Math.max(1, hi - lo);
+    return { level, current, needed, pct: Math.min(1, current / needed) };
+  }
 
   function loadStore() {
     try {
@@ -407,6 +432,9 @@
     prefsBtn:      $("#prefsBtn"),
     prefsLabel:    $("#prefsLabel"),
     prefsSheet:    $("#prefsSheet"),
+    levelBadge:    $("#levelBadge"),
+    levelNum:      $("#levelNum"),
+    levelFill:     $("#levelFill"),
   };
 
   function showView(name) {
@@ -432,6 +460,20 @@
     }
     renderDailyCard();
     renderAchievementsBadge();
+    renderLevelBadge();
+  }
+
+  function renderLevelBadge(opts = {}) {
+    if (!dom.levelBadge) return;
+    const lp = levelProgress();
+    const prestige = store.player?.prestige || 0;
+    dom.levelNum.textContent = prestige > 0 ? `★${prestige} · Lv ${lp.level}` : `Lv ${lp.level}`;
+    dom.levelFill.style.width = (lp.pct * 100) + "%";
+    if (opts.bump) {
+      dom.levelBadge.classList.remove("bump");
+      void dom.levelBadge.offsetWidth;
+      dom.levelBadge.classList.add("bump");
+    }
   }
 
   function renderGameType() {
@@ -789,10 +831,25 @@
     };
     const unlocked = unlockAchievements(ctx);
 
+    // Level-up detection. The new level is derived live from totalXP; we
+    // compare against the last seen value to decide if a toast should fire.
+    const newLevel = levelFromXP(store.totalXP);
+    const levelsGained = newLevel - (store.player.lastSeenLevel || 1);
+    if (levelsGained > 0) {
+      store.player.lastSeenLevel = newLevel;
+    }
+
     saveStore();
     renderSummary(beat);
     showView("summary");
     unlocked.forEach(queueToast);
+    if (levelsGained > 0) {
+      queueToast({
+        emoji: "▲",
+        name: `Level ${newLevel}`,
+        desc: levelsGained === 1 ? "New level reached." : `+${levelsGained} levels.`,
+      });
+    }
   }
 
   /* ─────────────────────────  Daily challenge  ──────────────────────────── */

@@ -188,7 +188,6 @@ ul { padding: 0; list-style: none; }
 .brand__name { font-size: 15px; }
 
 .icon-btn {
-  margin-left: auto;
   width: 38px; height: 38px;
   display: inline-grid; place-items: center;
   border-radius: 12px;
@@ -197,9 +196,59 @@ ul { padding: 0; list-style: none; }
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
   transition: transform 160ms var(--ease), background 160ms var(--ease);
+  flex-shrink: 0;
 }
+.topbar > .icon-btn:first-of-type { margin-left: auto; }
 .icon-btn:active { transform: scale(0.96); }
 .icon-btn:hover { background: var(--surface-2); }
+
+/* Player level chip — small "Lv 3" + a thin progress bar to the next level.
+   Lives between the brand and the icon buttons; gracefully hides on tight
+   screens by truncating the bar (the number stays). */
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 10px 0 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-left: 10px;
+  margin-right: auto;
+  font-variant-numeric: tabular-nums;
+  transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+.level-badge.bump {
+  animation: levelBump 600ms var(--ease-out);
+}
+@keyframes levelBump {
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 var(--accent-soft); }
+  40%  { transform: scale(1.08); box-shadow: 0 0 0 8px var(--accent-soft); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 var(--accent-soft); }
+}
+.level-badge__num {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+.level-badge__bar {
+  width: 56px; height: 4px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.level-badge__fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), #a78bfa);
+  border-radius: inherit;
+  transition: width 600ms var(--ease-out);
+}
+@media (max-width: 380px) {
+  .level-badge__bar { width: 36px; }
+}
 /* Sun/moon swap: sun visible in light, moon in dark. data-theme overrides. */
 .icon-sun, .icon-moon { transition: opacity 200ms var(--ease); }
 .icon-sun  { opacity: 1; }
