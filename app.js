@@ -404,8 +404,9 @@
     dailySub:      $("#dailySub"),
     dailyStreakNum:$("#dailyStreakNum"),
     toasts:        $("#toasts"),
-    statsStreak:   $('[data-stat="streak"]'),
-    statsStreakLbl: $('[data-stat-label="streak"]'),
+    prefsBtn:      $("#prefsBtn"),
+    prefsLabel:    $("#prefsLabel"),
+    prefsSheet:    $("#prefsSheet"),
   };
 
   function showView(name) {
@@ -440,11 +441,39 @@
       btn.setAttribute("aria-selected", active ? "true" : "false");
     });
     dom.segHint.textContent = GAME_TYPES[store.gameType].hint;
+    renderPrefsChip();
   }
 
   function renderReverseToggle() {
     dom.reverseToggle.classList.toggle("is-on", store.reverseMode);
     dom.reverseToggle.setAttribute("aria-pressed", store.reverseMode ? "true" : "false");
+    renderPrefsChip();
+  }
+
+  /** The chip on the home page summarises the active prefs at a glance. */
+  function renderPrefsChip() {
+    if (!dom.prefsLabel || !dom.prefsBtn) return;
+    const gtLabel = GAME_TYPES[store.gameType].label;
+    dom.prefsLabel.textContent = store.reverseMode ? `${gtLabel} · Reverse` : gtLabel;
+    // Highlight the chip whenever the user has diverged from the defaults.
+    const modified = store.gameType !== "practice" || store.reverseMode;
+    dom.prefsBtn.classList.toggle("is-modified", modified);
+  }
+
+  /* ─────────────────────────────  Sheet  ────────────────────────────────── */
+
+  function openPrefsSheet() {
+    if (!dom.prefsSheet) return;
+    dom.prefsSheet.hidden = false;
+    // Force reflow so the open transition runs.
+    void dom.prefsSheet.offsetWidth;
+    dom.prefsSheet.setAttribute("aria-hidden", "false");
+  }
+  function closePrefsSheet() {
+    if (!dom.prefsSheet) return;
+    dom.prefsSheet.setAttribute("aria-hidden", "true");
+    // Wait for the slide-out animation to finish before hiding.
+    setTimeout(() => { dom.prefsSheet.hidden = true; }, 360);
   }
 
   function renderDailyCard() {
@@ -1060,6 +1089,16 @@
       showView("achievements");
     });
     dom.achBack?.addEventListener("click", () => showView("home"));
+
+    dom.prefsBtn?.addEventListener("click", openPrefsSheet);
+    dom.prefsSheet?.addEventListener("click", (e) => {
+      if (e.target.matches("[data-sheet-close]")) closePrefsSheet();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && dom.prefsSheet?.getAttribute("aria-hidden") === "false") {
+        closePrefsSheet();
+      }
+    });
   }
 
   function bindGlobal() {
