@@ -7,7 +7,7 @@
    Bump CACHE_VERSION on any shipped asset change to invalidate old caches.
    ========================================================================= */
 
-const CACHE_VERSION = "mathgod-v2";
+const CACHE_VERSION = "mathgod-v3";
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`;
 
 // Relative URLs so the SW works from any GitHub Pages base path.

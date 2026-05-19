@@ -22,6 +22,24 @@ Selectable from the segmented control on the home screen:
   per difficulty is tracked.
 - **Sprint** — 60-second timer; solve as many as you can. Highest score per
   difficulty is tracked.
+- **Zen** — endless, no timer, no scoring pressure. Quit whenever you like;
+  answers and XP are saved.
+
+## Modifiers and bonus content
+
+- **Reverse mode** — flip the question. Instead of `7 × 8 = ?`, you solve
+  `? × 8 = 56`. Toggle from the home screen; works with every game type.
+- **Daily Challenge** — a fresh, deterministic 10-question set every day.
+  Same questions for everyone on the same day. Completing it grows your
+  daily streak.
+- **Combo multiplier** — 5 correct in a row earns 2× XP, 10 in a row earns
+  3×. A small badge in the header shows the active tier; a wrong answer
+  resets it.
+- **Achievements** — 12 unlocks across game types, streaks, and milestones.
+  Browse them from the trophy icon on the home screen. New unlocks toast in
+  at the top of the screen.
+- **Mistake review** — at the end of every session, an expandable list
+  shows the pairs you missed alongside the correct answers.
 
 Each summary shows correct / time / best streak / XP, and a "new personal
 best" badge whenever you beat the relevant record.
