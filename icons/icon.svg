@@ -1,13 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="rgb(99, 102, 241)"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgb(15, 14, 23)"/>
+      <stop offset="1" stop-color="rgb(8, 8, 14)"/>
+    </linearGradient>
+    <linearGradient id="mk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgb(244, 114, 182)"/>
       <stop offset="1" stop-color="rgb(139, 92, 246)"/>
     </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.8"/>
+    </filter>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <g stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.95">
-    <line x1="20" y1="20" x2="44" y2="44"/>
-    <line x1="44" y1="20" x2="20" y2="44"/>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <g transform="rotate(45 32 32)" filter="url(#glow)" opacity="0.55">
+    <rect x="12" y="29" width="40" height="6" rx="3" fill="url(#mk)"/>
+    <rect x="29" y="12" width="6" height="40" rx="3" fill="url(#mk)"/>
+  </g>
+  <g transform="rotate(45 32 32)">
+    <rect x="12" y="29" width="40" height="6" rx="3" fill="url(#mk)"/>
+    <rect x="29" y="12" width="6" height="40" rx="3" fill="url(#mk)"/>
   </g>
 </svg>
