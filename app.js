@@ -130,6 +130,114 @@
   const ITEM_BY_ID = Object.fromEntries(ITEMS.map((it) => [it.id, it]));
   const PRESTIGE_THRESHOLD_LEVEL = 25;
 
+  /* ───────────────────────────  Story catalog  ───────────────────────────
+     Five themed worlds; each has 8 normal levels plus a boss.
+     - normal level: complete `target` correct answers; you have `maxWrongs`
+       lives. Stars = 3 if no mistakes, 2 with 1, 1 otherwise.
+     - boss: a HP-based fight under a 60s timer. Correct answers chip the
+       boss; wrong answers cost a player life. Stars from remaining time.
+     The accent colour styles the world map and the in-game header.
+  ──────────────────────────────────────────────────────────────────────── */
+  const WORLDS = [
+    {
+      id: "grass",
+      name: "Grasslands",
+      desc: "Calm pastures where your journey begins.",
+      accent: "#16a34a",
+      tint: "linear-gradient(160deg, #22c55e, #65a30d)",
+      icon: "🌿",
+      levels: [
+        { name: "First steps",   mode: "1x1", target:  5, maxWrongs: 3, xp: 30 },
+        { name: "Tall grass",    mode: "1x1", target:  7, maxWrongs: 3, xp: 35 },
+        { name: "Quiet brook",   mode: "1x1", target:  8, maxWrongs: 2, xp: 40 },
+        { name: "Stone path",    mode: "1x1", target: 10, maxWrongs: 2, xp: 50 },
+        { name: "Sun-warmed",    mode: "1x1", target: 10, maxWrongs: 2, xp: 55 },
+        { name: "Open field",    mode: "1x1", target: 12, maxWrongs: 2, xp: 60 },
+        { name: "Mountain pass", mode: "1x1", target: 14, maxWrongs: 1, xp: 75, combo: 5 },
+        { name: "Forest edge",   mode: "1x1", target: 15, maxWrongs: 1, xp: 90, combo: 6 },
+      ],
+      boss: { name: "Forest Guardian", icon: "🛡", hp: 80, mode: "1x1", timeLimit: 60_000, xp: 200 },
+    },
+    {
+      id: "ice",
+      name: "Ice Caverns",
+      desc: "Frozen halls where every second counts.",
+      accent: "#06b6d4",
+      tint: "linear-gradient(160deg, #06b6d4, #3b82f6)",
+      icon: "❄",
+      levels: [
+        { name: "Frozen pond",  mode: "1x1", target:  8, maxWrongs: 2, xp: 60 },
+        { name: "Ice tunnel",   mode: "1x2", target:  6, maxWrongs: 3, xp: 70 },
+        { name: "Snowfall",     mode: "1x2", target:  8, maxWrongs: 3, xp: 80 },
+        { name: "Frozen sprint", mode: "1x1", gameType: "sprint", target: 14, maxWrongs: 99, xp: 90, timeLimit: 60_000 },
+        { name: "Glacier rift", mode: "1x2", target: 10, maxWrongs: 2, xp: 100 },
+        { name: "Aurora",       mode: "1x2", target: 10, maxWrongs: 2, xp: 110 },
+        { name: "Snowstorm",    mode: "1x2", target: 12, maxWrongs: 1, xp: 130, combo: 5 },
+        { name: "Crystal vault", mode: "1x2", target: 14, maxWrongs: 1, xp: 150, combo: 6 },
+      ],
+      boss: { name: "Frost Sentinel", icon: "❄", hp: 100, mode: "1x2", timeLimit: 60_000, xp: 280 },
+    },
+    {
+      id: "neon",
+      name: "Neon City",
+      desc: "Pulse-quick streets that reward long combos.",
+      accent: "#f472b6",
+      tint: "linear-gradient(160deg, #ec4899, #8b5cf6)",
+      icon: "✦",
+      levels: [
+        { name: "Downtown",   mode: "1x2", target: 10, maxWrongs: 2, xp: 110 },
+        { name: "Skyline",    mode: "1x2", target: 10, maxWrongs: 2, xp: 120, combo: 5 },
+        { name: "Arcade",     mode: "1x2", gameType: "sprint", target: 16, maxWrongs: 99, xp: 130, timeLimit: 60_000 },
+        { name: "Subway",     mode: "1x2", target: 12, maxWrongs: 1, xp: 140, combo: 6 },
+        { name: "Neon alley", mode: "1x2", target: 12, maxWrongs: 1, xp: 150, combo: 7 },
+        { name: "Rooftop",    mode: "1x2", target: 14, maxWrongs: 1, xp: 170, combo: 7 },
+        { name: "Highway",    mode: "1x2", target: 15, maxWrongs: 1, xp: 200, combo: 8 },
+        { name: "Penthouse",  mode: "1x2", target: 18, maxWrongs: 1, xp: 240, combo: 8 },
+      ],
+      boss: { name: "Voltage King", icon: "⚡", hp: 120, mode: "1x2", timeLimit: 60_000, xp: 380 },
+    },
+    {
+      id: "volcano",
+      name: "Volcano Core",
+      desc: "Two-digit fire under serious time pressure.",
+      accent: "#f97316",
+      tint: "linear-gradient(160deg, #f97316, #dc2626)",
+      icon: "🔥",
+      levels: [
+        { name: "Foothills",     mode: "2x2", target:  6, maxWrongs: 3, xp: 160 },
+        { name: "Ash plains",    mode: "2x2", target:  8, maxWrongs: 3, xp: 180 },
+        { name: "Lava tube",     mode: "2x2", target:  8, maxWrongs: 2, xp: 200 },
+        { name: "Pyre",          mode: "2x2", target: 10, maxWrongs: 2, xp: 230, timeLimit: 90_000 },
+        { name: "Magma chamber", mode: "2x2", target: 10, maxWrongs: 1, xp: 260, timeLimit: 75_000 },
+        { name: "Obsidian gate", mode: "2x2", target: 12, maxWrongs: 1, xp: 290 },
+        { name: "Flame spire",   mode: "2x2", gameType: "sprint", target: 12, maxWrongs: 99, xp: 310, timeLimit: 60_000 },
+        { name: "Inferno",       mode: "2x2", target: 14, maxWrongs: 1, xp: 360, combo: 6 },
+      ],
+      boss: { name: "Magma Titan", icon: "🔥", hp: 140, mode: "2x2", timeLimit: 60_000, xp: 500 },
+    },
+    {
+      id: "sky",
+      name: "Sky Kingdom",
+      desc: "The final realm. Mixed pools and reverse questions.",
+      accent: "#fbbf24",
+      tint: "linear-gradient(160deg, #fbbf24, #f59e0b)",
+      icon: "👑",
+      levels: [
+        { name: "Cloud bridge",     mode: "1x2", target: 10, maxWrongs: 2, xp: 220, reverse: true },
+        { name: "Sun temple",       mode: "2x2", target:  8, maxWrongs: 2, xp: 240 },
+        { name: "Wind path",        mode: "1x2", target: 12, maxWrongs: 1, xp: 280, reverse: true, combo: 5 },
+        { name: "Floating gardens", mode: "2x2", target: 10, maxWrongs: 1, xp: 320 },
+        { name: "Aurora reach",     mode: "1x2", gameType: "sprint", target: 18, maxWrongs: 99, xp: 340, timeLimit: 60_000, reverse: true },
+        { name: "Star deck",        mode: "2x2", target: 12, maxWrongs: 1, xp: 380, combo: 6 },
+        { name: "Skyfall",          mode: "2x2", target: 14, maxWrongs: 1, xp: 420, combo: 7, reverse: true },
+        { name: "Heaven's gate",    mode: "2x2", target: 16, maxWrongs: 1, xp: 480, combo: 8 },
+      ],
+      boss: { name: "Sky Sovereign", icon: "👑", hp: 180, mode: "2x2", timeLimit: 60_000, xp: 700 },
+    },
+  ];
+
+  const WORLD_BY_ID = Object.fromEntries(WORLDS.map((w) => [w.id, w]));
+
   /* Achievements: id → metadata + unlock predicate evaluated after a session. */
   const ACHIEVEMENTS = [
     { id: "first",        emoji: "✦", name: "First steps",       desc: "Finish your first session.",
@@ -194,6 +302,10 @@
       },
       featured: { date: null, ids: [] },
     },
+    story: {
+      currentWorld: 0,             // index into WORLDS for the world tab
+      progress: {},                // worldId -> { unlocked, levels: [{stars, completed}], bossDefeated, bossStars }
+    },
   });
 
   /* ─────────────────────────────  Levels  ───────────────────────────────── */
@@ -239,6 +351,11 @@
           owned:    { ...(parsed.shop?.owned    || {}) },
           equipped: { ...d.shop.equipped, ...(parsed.shop?.equipped || {}) },
           featured: { ...d.shop.featured, ...(parsed.shop?.featured || {}) },
+        },
+        story:  {
+          ...d.story,
+          ...(parsed.story || {}),
+          progress: { ...(parsed.story?.progress || {}) },
         },
       };
     } catch {
@@ -292,7 +409,17 @@
   let session = null;
 
   function freshSession(mode, gameType, opts = {}) {
-    const cfg = GAME_TYPES[gameType];
+    const baseCfg = GAME_TYPES[gameType];
+    // Story levels may override timeLimit and lives.
+    const story = opts.story || null;
+    const cfg = story
+      ? {
+          ...baseCfg,
+          timeLimit: story.timeLimit || 0,
+          lives:     story.maxWrongs ?? baseCfg.lives,
+          length:    story.isBoss ? Infinity : baseCfg.length,
+        }
+      : baseCfg;
     return {
       mode,                          // null when isDaily (mixed pool)
       gameType,
@@ -301,6 +428,10 @@
       isDaily: !!opts.isDaily,
       dailyQuestions: opts.dailyQuestions || null,
       dailyIdx: 0,
+      isStory: !!story,
+      story,
+      bossHP:    story?.isBoss ? story.bossHP : 0,
+      bossMaxHP: story?.isBoss ? story.bossHP : 0,
       index: 0,
       input: "",
       streak: 0,
@@ -512,10 +643,35 @@
     shopGrid:      $("#shopGrid"),
     prestigeBox:   $("#prestigeBox"),
     prestigeBtn:   $("#prestigeBtn"),
+    storyCard:     $("#storyCard"),
+    storyWorldName:$("#storyWorldName"),
+    storyProgressText: $("#storyProgressText"),
+    storyCta:      $("#storyCta"),
+    storyBarFill:  $("#storyBarFill"),
+    storyBackBtn:  $("#storyBackBtn"),
+    storyStars:    $("#storyStars"),
+    storyWorldTabs:$("#storyWorldTabs"),
+    storyWorldHead:$("#storyWorldHead"),
+    storyMap:      $("#storyMap"),
+    levelSheet:    $("#levelSheet"),
+    levelSheetWorld: $("#levelSheetWorld"),
+    levelSheetTitle: $("#levelSheetTitle"),
+    levelSheetStars: $("#levelSheetStars"),
+    levelSheetObjs:  $("#levelSheetObjs"),
+    levelSheetStart: $("#levelSheetStart"),
+    bossBar:       $("#bossBar"),
+    bossAvatar:    $("#bossAvatar"),
+    bossName:      $("#bossName"),
+    bossHpFill:    $("#bossHpFill"),
+    bossLives:     $("#bossLives"),
+    storyHud:      $("#storyHud"),
+    storyHudCount: $("#storyHudCount"),
+    storyHudLives: $("#storyHudLives"),
   };
 
-  // Includes the shop view alongside the existing ones.
-  views.shop = $('[data-view="shop"]');
+  // Register the additional views.
+  views.shop  = $('[data-view="shop"]');
+  views.story = $('[data-view="story"]');
 
   function showView(name) {
     Object.entries(views).forEach(([k, el]) => {
@@ -541,6 +697,174 @@
     renderDailyCard();
     renderAchievementsBadge();
     renderLevelBadge();
+    renderStoryHomeCard();
+  }
+
+  /* ────────────────────────  Story home + map  ──────────────────────────── */
+
+  function renderStoryHomeCard() {
+    if (!dom.storyCard) return;
+    syncStoryProgress();
+    const next = nextStoryTarget();
+    if (next) {
+      const w = WORLDS[next.worldIdx];
+      const completed = ensureWorldProgress(next.worldIdx).levels.filter(l => l.completed).length;
+      dom.storyWorldName.textContent = w.name;
+      dom.storyCard.style.setProperty("--story-tint", w.tint);
+      dom.storyCard.style.setProperty("--story-accent", w.accent);
+      if (next.kind === "boss") {
+        dom.storyProgressText.textContent = `${w.name} · Boss awaits`;
+      } else {
+        dom.storyProgressText.textContent = `${w.name} · Level ${next.levelIdx + 1} of ${w.levels.length}`;
+      }
+      dom.storyCta.textContent = "Continue →";
+      const pct = (completed / w.levels.length) * 100;
+      dom.storyBarFill.style.width = pct + "%";
+    } else {
+      // All worlds cleared.
+      dom.storyWorldName.textContent = "Complete";
+      dom.storyProgressText.textContent = "All worlds cleared.";
+      dom.storyCta.textContent = "Replay →";
+      dom.storyBarFill.style.width = "100%";
+    }
+  }
+
+  function openStory(worldIdx = store.story.currentWorld || 0) {
+    syncStoryProgress();
+    // Clamp to a valid unlocked world.
+    let idx = worldIdx;
+    if (!ensureWorldProgress(idx)?.unlocked) {
+      for (let i = WORLDS.length - 1; i >= 0; i--) {
+        if (ensureWorldProgress(i).unlocked) { idx = i; break; }
+      }
+    }
+    store.story.currentWorld = idx;
+    renderStoryView();
+    showView("story");
+  }
+
+  function renderStoryView() {
+    const idx = store.story.currentWorld || 0;
+    // Total stars.
+    const t = totalStars();
+    dom.storyStars.textContent = `★ ${t.earned} / ${t.max}`;
+    // World tabs.
+    dom.storyWorldTabs.innerHTML = "";
+    for (let i = 0; i < WORLDS.length; i++) {
+      const w = WORLDS[i];
+      const p = ensureWorldProgress(i);
+      const btn = document.createElement("button");
+      btn.className = "story-world-tab"
+        + (i === idx ? " is-active" : "")
+        + (!p.unlocked ? " is-locked" : "");
+      btn.type = "button";
+      btn.dataset.world = String(i);
+      btn.innerHTML = `<span class="story-world-tab__icon">${p.unlocked ? w.icon : "🔒"}</span>
+                       <span class="story-world-tab__name">${w.name}</span>`;
+      dom.storyWorldTabs.appendChild(btn);
+    }
+    // World head: name + accent.
+    const w = WORLDS[idx];
+    const p = ensureWorldProgress(idx);
+    document.documentElement.style.setProperty("--story-current-accent", w.accent);
+    dom.storyWorldHead.innerHTML = `
+      <div class="story-world-head__body">
+        <p class="story-world-head__title">${w.name}</p>
+        <p class="story-world-head__desc">${w.desc}</p>
+      </div>
+      <span class="story-world-head__badge" style="background:${w.tint}">${w.icon}</span>
+    `;
+    // Map nodes.
+    dom.storyMap.innerHTML = "";
+    dom.storyMap.style.setProperty("--story-accent", w.accent);
+    dom.storyMap.style.setProperty("--story-tint", w.tint);
+    for (let li = 0; li < w.levels.length; li++) {
+      const lvl = w.levels[li];
+      const entry = p.levels[li];
+      const unlocked = isLevelUnlocked(idx, li);
+      const node = document.createElement("button");
+      node.type = "button";
+      node.className = "story-node"
+        + (li % 2 === 0 ? " story-node--left" : " story-node--right")
+        + (unlocked ? "" : " is-locked")
+        + (entry.completed ? " is-completed" : "");
+      node.dataset.world = String(idx);
+      node.dataset.level = String(li);
+      node.innerHTML = `
+        <span class="story-node__circle">${unlocked ? li + 1 : "🔒"}</span>
+        <span class="story-node__name">${lvl.name}</span>
+        <span class="story-node__stars">
+          ${[0, 1, 2].map(i => `<i class="${i < entry.stars ? "is-on" : ""}">★</i>`).join("")}
+        </span>
+      `;
+      dom.storyMap.appendChild(node);
+    }
+    // Boss node.
+    const bossUnlocked = isBossUnlocked(idx);
+    const bossNode = document.createElement("button");
+    bossNode.type = "button";
+    bossNode.className = "story-node story-node--boss story-node--center"
+      + (bossUnlocked ? "" : " is-locked")
+      + (p.bossDefeated ? " is-completed" : "");
+    bossNode.dataset.world = String(idx);
+    bossNode.dataset.level = "-1";
+    bossNode.innerHTML = `
+      <span class="story-node__circle story-node__circle--boss">${bossUnlocked ? w.boss.icon : "🔒"}</span>
+      <span class="story-node__name">${w.boss.name}</span>
+      <span class="story-node__stars">
+        ${[0, 1, 2].map(i => `<i class="${i < (p.bossStars || 0) ? "is-on" : ""}">★</i>`).join("")}
+      </span>
+    `;
+    dom.storyMap.appendChild(bossNode);
+  }
+
+  /* ───────────────────────  Level intro sheet  ──────────────────────────── */
+
+  let pendingLevel = null;  // { worldIdx, levelIdx }
+
+  function openLevelSheet(worldIdx, levelIdx) {
+    const w = WORLDS[worldIdx];
+    if (!w) return;
+    const isBoss = levelIdx < 0;
+    const cfg = isBoss ? w.boss : w.levels[levelIdx];
+    const unlocked = isBoss ? isBossUnlocked(worldIdx) : isLevelUnlocked(worldIdx, levelIdx);
+    if (!unlocked) return;
+    pendingLevel = { worldIdx, levelIdx };
+    const p = ensureWorldProgress(worldIdx);
+    const stars = isBoss ? (p.bossStars || 0) : (p.levels[levelIdx]?.stars || 0);
+    dom.levelSheetWorld.textContent = w.name;
+    dom.levelSheetTitle.textContent = cfg.name;
+    dom.levelSheetStars.textContent =
+      "★".repeat(stars) + "☆".repeat(3 - stars);
+    const objs = [];
+    if (isBoss) {
+      objs.push(`Defeat ${cfg.name} (HP ${cfg.hp})`);
+      objs.push(`Time limit ${formatTime(cfg.timeLimit)}`);
+      objs.push(`Mode · ${cfg.mode}`);
+      objs.push(`Reward · ${cfg.xp} XP`);
+    } else {
+      objs.push(`Answer ${cfg.target} correctly`);
+      if ((cfg.maxWrongs ?? 3) < 99) objs.push(`Lives · ${cfg.maxWrongs ?? 3}`);
+      if (cfg.timeLimit) objs.push(`Time · ${formatTime(cfg.timeLimit)}`);
+      if (cfg.combo) objs.push(`Bonus combo · ${cfg.combo}`);
+      if (cfg.reverse) objs.push("Reverse questions");
+      objs.push(`Mode · ${cfg.mode}`);
+      objs.push(`Reward · ${cfg.xp} XP`);
+    }
+    dom.levelSheetObjs.innerHTML = objs.map(o => `<li>${o}</li>`).join("");
+    openSheet(dom.levelSheet);
+  }
+
+  function openSheet(sheet) {
+    if (!sheet) return;
+    sheet.hidden = false;
+    void sheet.offsetWidth;
+    sheet.setAttribute("aria-hidden", "false");
+  }
+  function closeSheet(sheet) {
+    if (!sheet) return;
+    sheet.setAttribute("aria-hidden", "true");
+    setTimeout(() => { sheet.hidden = true; }, 360);
   }
 
   function renderLevelBadge(opts = {}) {
@@ -802,21 +1126,170 @@
     return 1 + 0.05 * (store.player.prestige || 0);
   }
 
+  /* ───────────────────────────────  Story  ──────────────────────────────── */
+
+  /** Lazy-create the persisted progress slot for a world. */
+  function ensureWorldProgress(worldIdx) {
+    const w = WORLDS[worldIdx];
+    if (!w) return null;
+    let p = store.story.progress[w.id];
+    if (!p) {
+      p = {
+        unlocked: worldIdx === 0,
+        levels: w.levels.map(() => ({ stars: 0, completed: false })),
+        bossDefeated: false,
+        bossStars: 0,
+      };
+      store.story.progress[w.id] = p;
+    }
+    // Lengthen levels array if WORLDS grew.
+    if (p.levels.length < w.levels.length) {
+      while (p.levels.length < w.levels.length) p.levels.push({ stars: 0, completed: false });
+    }
+    return p;
+  }
+
+  /** Bootstrap progress for every world on first access. */
+  function syncStoryProgress() {
+    for (let i = 0; i < WORLDS.length; i++) ensureWorldProgress(i);
+  }
+
+  /** Returns true if the user can start a given level. */
+  function isLevelUnlocked(worldIdx, levelIdx) {
+    const p = ensureWorldProgress(worldIdx);
+    if (!p?.unlocked) return false;
+    if (levelIdx === 0) return true;
+    return p.levels[levelIdx - 1]?.completed;
+  }
+  function isBossUnlocked(worldIdx) {
+    const p = ensureWorldProgress(worldIdx);
+    if (!p?.unlocked) return false;
+    return p.levels.every((l) => l.completed);
+  }
+
+  /** Total stars across all worlds — used in the story hero card. */
+  function totalStars() {
+    let earned = 0, max = 0;
+    for (const w of WORLDS) {
+      const p = ensureWorldProgress(WORLDS.indexOf(w));
+      for (const l of p.levels) {
+        earned += l.stars;
+        max += 3;
+      }
+      earned += p.bossStars || 0;
+      max += 3;
+    }
+    return { earned, max };
+  }
+
+  /** Pick the next thing the player should do for the "Continue" CTA. */
+  function nextStoryTarget() {
+    for (let wi = 0; wi < WORLDS.length; wi++) {
+      const w = WORLDS[wi];
+      const p = ensureWorldProgress(wi);
+      if (!p.unlocked) continue;
+      for (let li = 0; li < w.levels.length; li++) {
+        if (!p.levels[li].completed) return { worldIdx: wi, levelIdx: li, kind: "level" };
+      }
+      if (!p.bossDefeated) return { worldIdx: wi, levelIdx: -1, kind: "boss" };
+    }
+    return null;
+  }
+
+  /** Build a story session from a world/level reference and start it. */
+  function startStoryLevel(worldIdx, levelIdx) {
+    const w = WORLDS[worldIdx];
+    if (!w) return;
+    const isBoss = levelIdx < 0;
+    const cfg = isBoss ? w.boss : w.levels[levelIdx];
+    if (!cfg) return;
+    if (isBoss && !isBossUnlocked(worldIdx)) return;
+    if (!isBoss && !isLevelUnlocked(worldIdx, levelIdx)) return;
+
+    store.story.currentWorld = worldIdx;
+    saveStore();
+
+    const gameType = cfg.gameType || "practice";
+    startSession(cfg.mode, {
+      gameType,
+      reverse: !!cfg.reverse,
+      story: {
+        worldIdx,
+        levelIdx,                  // -1 for boss
+        isBoss,
+        accent: w.accent,
+        tint: w.tint,
+        worldName: w.name,
+        levelName: cfg.name,
+        target: cfg.target || 10,
+        maxWrongs: cfg.maxWrongs ?? 3,
+        timeLimit: cfg.timeLimit || (gameType === "sprint" ? SPRINT_DURATION_MS : 0),
+        comboGoal: cfg.combo || 0,
+        bossHP: isBoss ? cfg.hp : 0,
+        bossName: isBoss ? cfg.name : "",
+        bossIcon: isBoss ? cfg.icon : "",
+        xpReward: cfg.xp || 50,
+      },
+    });
+  }
+
+  /** Resolve the star count from a completed story session. */
+  function computeStoryStars(sess) {
+    if (!sess.story) return 0;
+    if (sess.story.isBoss) {
+      // Boss: 1 for defeat, +1 for ≥30s left, +1 for ≥45s left.
+      if (sess.bossHP > 0) return 0;
+      const left = sess.timeLeftMs;
+      if (left >= 45_000) return 3;
+      if (left >= 30_000) return 2;
+      return 1;
+    }
+    // Normal level: based on wrongs.
+    if (sess.correct < sess.story.target) return 0;
+    if (sess.wrong === 0) return 3;
+    if (sess.wrong === 1) return 2;
+    return 1;
+  }
+
+  /** Persist story result after finishSession. */
+  function finalizeStory(sess) {
+    const s = sess.story;
+    if (!s) return { stars: 0, firstClear: false, justUnlockedWorld: null };
+    const stars = computeStoryStars(sess);
+    const p = ensureWorldProgress(s.worldIdx);
+    let firstClear = false;
+    let justUnlockedWorld = null;
+
+    if (s.isBoss) {
+      if (stars > 0) {
+        if (!p.bossDefeated) firstClear = true;
+        p.bossDefeated = true;
+        p.bossStars = Math.max(p.bossStars || 0, stars);
+        // Unlock next world if any.
+        const nextIdx = s.worldIdx + 1;
+        if (nextIdx < WORLDS.length) {
+          const np = ensureWorldProgress(nextIdx);
+          if (!np.unlocked) {
+            np.unlocked = true;
+            justUnlockedWorld = WORLDS[nextIdx];
+          }
+        }
+      }
+    } else {
+      const entry = p.levels[s.levelIdx];
+      if (stars > 0) {
+        if (!entry.completed) firstClear = true;
+        entry.completed = true;
+        entry.stars = Math.max(entry.stars || 0, stars);
+      }
+    }
+    return { stars, firstClear, justUnlockedWorld };
+  }
+
   /* ─────────────────────────────  Sheet  ────────────────────────────────── */
 
-  function openPrefsSheet() {
-    if (!dom.prefsSheet) return;
-    dom.prefsSheet.hidden = false;
-    // Force reflow so the open transition runs.
-    void dom.prefsSheet.offsetWidth;
-    dom.prefsSheet.setAttribute("aria-hidden", "false");
-  }
-  function closePrefsSheet() {
-    if (!dom.prefsSheet) return;
-    dom.prefsSheet.setAttribute("aria-hidden", "true");
-    // Wait for the slide-out animation to finish before hiding.
-    setTimeout(() => { dom.prefsSheet.hidden = true; }, 360);
-  }
+  function openPrefsSheet()  { openSheet(dom.prefsSheet); }
+  function closePrefsSheet() { closeSheet(dom.prefsSheet); }
 
   function renderDailyCard() {
     const today = todayKey();
@@ -895,7 +1368,70 @@
     dom.answer.classList.remove("is-correct", "is-wrong");
   }
 
+  function renderBossUI() {
+    if (!dom.bossBar) return;
+    if (!session?.isStory || !session.story.isBoss) {
+      dom.bossBar.hidden = true;
+      // Reset story tint when leaving a story session.
+      document.documentElement.removeAttribute("data-story-accent");
+      return;
+    }
+    const s = session.story;
+    dom.bossBar.hidden = false;
+    dom.bossAvatar.textContent = s.bossIcon || "◆";
+    dom.bossName.textContent = s.bossName;
+    const pct = (session.bossHP / Math.max(1, session.bossMaxHP)) * 100;
+    dom.bossHpFill.style.width = pct + "%";
+    dom.bossHpFill.classList.toggle("is-low", pct <= 30);
+    // Lives display: hearts.
+    const lives = Math.max(0, session.livesLeft);
+    dom.bossLives.innerHTML = "";
+    for (let i = 0; i < lives; i++) {
+      const h = document.createElement("span");
+      h.className = "boss-bar__heart";
+      h.textContent = "♥";
+      dom.bossLives.appendChild(h);
+    }
+  }
+
+  function renderStoryHud() {
+    // Non-boss story levels: show a small "X / target" badge + hearts in place of progress.
+    if (!dom.storyHud) return;
+    if (!session?.isStory || session.story.isBoss) {
+      dom.storyHud.hidden = true;
+      return;
+    }
+    const s = session.story;
+    dom.storyHud.hidden = false;
+    dom.storyHudCount.textContent = `${session.correct} / ${s.target}`;
+    dom.storyHudLives.innerHTML = "";
+    if (s.maxWrongs < 99) {
+      for (let i = 0; i < Math.max(0, session.livesLeft); i++) {
+        const h = document.createElement("span");
+        h.className = "story-hud__heart";
+        h.textContent = "♥";
+        dom.storyHudLives.appendChild(h);
+      }
+    }
+  }
+
   function renderProgress() {
+    renderBossUI();
+    renderStoryHud();
+    if (session.isStory) {
+      dom.progressWrap.hidden = true;
+      if (session.cfg.timeLimit > 0) {
+        dom.timerBadge.hidden = false;
+        const low = session.timeLeftMs <= LOW_TIME_THRESHOLD_MS;
+        dom.timerBadge.classList.toggle("is-low", low);
+        dom.timerBadge.textContent = formatTime(session.timeLeftMs);
+      } else {
+        dom.timerBadge.hidden = true;
+      }
+      document.documentElement.setAttribute("data-story-accent", String(session.story.worldIdx));
+      return;
+    }
+    document.documentElement.removeAttribute("data-story-accent");
     const gt = session.gameType;
     if (gt === "practice") {
       dom.progressWrap.hidden = false;
@@ -976,6 +1512,7 @@
       reverse: opts.reverse ?? store.reverseMode,
       isDaily: !!opts.isDaily,
       dailyQuestions: opts.dailyQuestions,
+      story: opts.story || null,
     });
     session.startTime = Date.now();
 
@@ -989,6 +1526,7 @@
     nextQuestion();
     renderStreak();
     renderProgress();
+    renderBossUI();
     showView("game");
     if (session.cfg.timeLimit > 0) startTimer();
   }
@@ -1027,6 +1565,12 @@
       const baseGain = (XP_PER_CORRECT + Math.min(session.streak, 10) * XP_STREAK_BONUS) * multiplier;
       const gained = Math.round(baseGain * prestigeMultiplier());
       session.xp += gained;
+      // Boss damage — base 10, combo crits ramp up.
+      if (session.isStory && session.story.isBoss) {
+        const dmg = session.comboTier === 2 ? 25 : session.comboTier === 1 ? 16 : 10;
+        session.bossHP = Math.max(0, session.bossHP - dmg);
+        renderBossUI();
+      }
       dom.answer.classList.add("is-correct");
       dom.feedback.textContent = pick(FEEDBACK_CORRECT);
       dom.feedback.classList.add("is-correct");
@@ -1043,6 +1587,7 @@
         a: q.a, b: q.b, product: q.product,
         guess, reverse: session.reverse, pos: q.pos, target: q.target,
       });
+      if (session.isStory) renderBossUI();
       dom.answer.classList.add("is-wrong");
       dom.feedback.textContent = FEEDBACK_WRONG(q.a, q.b);
       dom.feedback.classList.add("is-wrong");
@@ -1064,10 +1609,20 @@
     if (!session) return;
     session.index += 1;
     renderProgress();
-    const done =
-      (session.gameType === "survival" && !lastWasCorrect) ||
-      (session.gameType === "practice" && session.index >= session.cfg.length) ||
-      (session.isDaily && session.dailyIdx >= session.dailyQuestions.length);
+    let done = false;
+    if (session.isStory) {
+      const s = session.story;
+      if (s.isBoss) {
+        done = session.bossHP <= 0 || session.livesLeft <= 0;
+      } else {
+        done = session.correct >= s.target || session.livesLeft <= 0;
+      }
+    } else {
+      done =
+        (session.gameType === "survival" && !lastWasCorrect) ||
+        (session.gameType === "practice" && session.index >= session.cfg.length) ||
+        (session.isDaily && session.dailyIdx >= session.dailyQuestions.length);
+    }
     if (done) finishSession();
     else nextQuestion();
   }
@@ -1095,24 +1650,27 @@
       (session.gameType === "practice" && session.index >= cfg.length) ||
       (session.isDaily && session.dailyIdx >= (session.dailyQuestions?.length || 0));
 
+    // Story result first, so XP rewards can be tallied below.
+    let storyResult = null;
+    if (session.isStory) {
+      storyResult = finalizeStory(session);
+      if (storyResult.stars > 0) session.xp += session.story.xpReward;
+    }
+
     // Persistent counters.
     store.totalXP += session.xp;
     store.totalSessions += 1;
     store.totalCorrect += session.correct;
     store.bestStreak = Math.max(store.bestStreak, session.bestStreak);
 
-    // Daily streak: only update for sessions that genuinely "happened".
-    if (session.correct > 0) {
-      updateDailyStreak();
-    }
-    // Daily-challenge completion: mark today as done.
+    if (session.correct > 0) updateDailyStreak();
     if (session.isDaily && completedFully) {
       store.daily.lastCompletedDate = todayKey();
     }
 
-    // Beat per-record bests (non-daily, non-zen).
+    // Beat per-record bests (regular sessions only — not daily / story).
     let beat = false;
-    if (!session.isDaily && cfg.recordKey) {
+    if (!session.isDaily && !session.isStory && cfg.recordKey) {
       if (cfg.recordKey === "timeMs") {
         if (completedFully) beat = tryBeatRecord(session.gameType, session.mode, session.elapsedMs);
       } else if (cfg.recordKey === "streak") {
@@ -1122,7 +1680,7 @@
       }
     }
 
-    // Achievements — evaluate after counters update.
+    // Achievements.
     const ctx = {
       gameType: session.gameType,
       reverse: session.reverse,
@@ -1133,16 +1691,13 @@
     };
     const unlocked = unlockAchievements(ctx);
 
-    // Level-up detection. The new level is derived live from totalXP; we
-    // compare against the last seen value to decide if a toast should fire.
+    // Level-up detection.
     const newLevel = levelFromXP(store.totalXP);
     const levelsGained = newLevel - (store.player.lastSeenLevel || 1);
-    if (levelsGained > 0) {
-      store.player.lastSeenLevel = newLevel;
-    }
+    if (levelsGained > 0) store.player.lastSeenLevel = newLevel;
 
     saveStore();
-    renderSummary(beat);
+    renderSummary(beat, storyResult);
     showView("summary");
     unlocked.forEach(queueToast);
     if (levelsGained > 0) {
@@ -1150,6 +1705,13 @@
         emoji: "▲",
         name: `Level ${newLevel}`,
         desc: levelsGained === 1 ? "New level reached." : `+${levelsGained} levels.`,
+      });
+    }
+    if (storyResult?.justUnlockedWorld) {
+      queueToast({
+        emoji: "★",
+        name: `Unlocked · ${storyResult.justUnlockedWorld.name}`,
+        desc: storyResult.justUnlockedWorld.desc,
       });
     }
   }
@@ -1242,11 +1804,19 @@
 
   /* ──────────────────────────────  Summary  ─────────────────────────────── */
 
-  function renderSummary(beat) {
+  function renderSummary(beat, storyResult) {
     const total = session.correct + session.wrong;
     const gt = session.gameType;
 
-    if (session.isDaily) {
+    if (session.isStory) {
+      const s = session.story;
+      if (s.isBoss) {
+        const defeated = session.bossHP <= 0;
+        dom.sumCorrect.textContent = defeated ? "WIN" : "—";
+      } else {
+        dom.sumCorrect.textContent = `${session.correct}/${s.target}`;
+      }
+    } else if (session.isDaily) {
       dom.sumCorrect.textContent = `${session.correct}/10`;
     } else if (gt === "practice") {
       dom.sumCorrect.textContent = `${session.correct}/${session.cfg.length}`;
@@ -1264,7 +1834,19 @@
 
     const r = total ? session.correct / total : 0;
     let title, sub, emoji;
-    if (session.isDaily) {
+    if (session.isStory) {
+      const s = session.story;
+      const stars = storyResult?.stars || 0;
+      const won = stars > 0;
+      emoji = won ? (stars === 3 ? "★" : stars === 2 ? "✦" : "◆") : "○";
+      if (s.isBoss) {
+        title = won ? `${s.bossName} defeated.` : "Defeated.";
+        sub   = won ? "★".repeat(stars) + "☆".repeat(3 - stars) + " · World cleared." : "Regroup and try again.";
+      } else {
+        title = won ? `${s.levelName} cleared.` : `${s.levelName}`;
+        sub   = won ? "★".repeat(stars) + "☆".repeat(3 - stars) : "Not enough correct answers.";
+      }
+    } else if (session.isDaily) {
       if (r === 1)        { title = "Daily complete.";   sub = `Perfect run · ${formatTime(session.elapsedMs)}.`; emoji = "★"; }
       else if (r >= 0.7)  { title = "Daily complete.";   sub = `${session.correct} of 10 today.`;                  emoji = "✦"; }
       else                { title = "Daily logged.";     sub = "Daily streak counted — back tomorrow.";           emoji = "◆"; }
@@ -1344,6 +1926,7 @@
     cancelPendingAdvance();
     stopTimer();
     session = null;
+    document.documentElement.removeAttribute("data-story-accent");
     renderHomeStats();
     renderGameType();
     renderReverseToggle();
@@ -1467,6 +2050,35 @@
     });
     dom.prestigeBtn?.addEventListener("click", performPrestige);
 
+    // Story navigation.
+    dom.storyCard?.addEventListener("click", () => {
+      const next = nextStoryTarget();
+      openStory(next ? next.worldIdx : 0);
+    });
+    dom.storyBackBtn?.addEventListener("click", () => goHome());
+    dom.storyWorldTabs?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".story-world-tab");
+      if (!btn || btn.classList.contains("is-locked")) return;
+      store.story.currentWorld = parseInt(btn.dataset.world, 10);
+      saveStore();
+      renderStoryView();
+    });
+    dom.storyMap?.addEventListener("click", (e) => {
+      const node = e.target.closest(".story-node");
+      if (!node || node.classList.contains("is-locked")) return;
+      openLevelSheet(parseInt(node.dataset.world, 10), parseInt(node.dataset.level, 10));
+    });
+    dom.levelSheet?.addEventListener("click", (e) => {
+      if (e.target.matches("[data-sheet-close]")) closeSheet(dom.levelSheet);
+    });
+    dom.levelSheetStart?.addEventListener("click", () => {
+      if (!pendingLevel) return;
+      const { worldIdx, levelIdx } = pendingLevel;
+      pendingLevel = null;
+      closeSheet(dom.levelSheet);
+      startStoryLevel(worldIdx, levelIdx);
+    });
+
     dom.prefsBtn?.addEventListener("click", openPrefsSheet);
     dom.prefsSheet?.addEventListener("click", (e) => {
       if (e.target.matches("[data-sheet-close]")) closePrefsSheet();
@@ -1489,16 +2101,48 @@
     });
     dom.againBtn?.addEventListener("click", () => {
       if (!session) return goHome();
-      // Repeat the same kind of session (including reverse/daily).
-      if (session.isDaily) {
-        // After completing the daily, "Again" goes home (it's once per day).
+      if (session.isStory) {
+        const s = session.story;
+        const p = ensureWorldProgress(s.worldIdx);
+        const passed = s.isBoss ? p.bossDefeated : !!p.levels[s.levelIdx]?.completed;
+        // Passed → advance to the next level (or boss); failed → retry the same one.
+        if (passed) {
+          if (s.isBoss) {
+            const nextWorld = s.worldIdx + 1;
+            if (nextWorld < WORLDS.length && ensureWorldProgress(nextWorld).unlocked) {
+              store.story.currentWorld = nextWorld;
+              saveStore();
+              openStory(nextWorld);
+            } else {
+              goHome();
+            }
+          } else if (s.levelIdx + 1 < WORLDS[s.worldIdx].levels.length) {
+            startStoryLevel(s.worldIdx, s.levelIdx + 1);
+          } else {
+            // All normal levels done — point at the boss.
+            startStoryLevel(s.worldIdx, -1);
+          }
+        } else {
+          startStoryLevel(s.worldIdx, s.levelIdx);
+        }
+      } else if (session.isDaily) {
         goHome();
       } else {
         const last = session.mode || "1x1";
         startSession(last, { gameType: session.gameType, reverse: session.reverse });
       }
     });
-    dom.homeBtn?.addEventListener("click", goHome);
+    dom.homeBtn?.addEventListener("click", () => {
+      // Returning home from a story summary jumps back to the world map.
+      if (session?.isStory) {
+        const w = session.story.worldIdx;
+        session = null;
+        document.documentElement.removeAttribute("data-story-accent");
+        openStory(w);
+      } else {
+        goHome();
+      }
+    });
     dom.onboardStart?.addEventListener("click", () => {
       store.onboarded = true;
       saveStore();

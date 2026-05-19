@@ -1620,6 +1620,350 @@ ul { padding: 0; list-style: none; }
   background: linear-gradient(180deg, #fde047, #f59e0b);
 }
 
+/* ─────────────────────────  Story hero card  ──────────────────────────── */
+.story-card {
+  --story-tint: linear-gradient(160deg, var(--accent), #8b5cf6);
+  --story-accent: var(--accent);
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--story-tint);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  position: relative;
+  overflow: hidden;
+  transition: transform 200ms var(--ease);
+}
+.story-card:active { transform: scale(0.985); }
+.story-card__top {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.story-card__title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+.story-card__world {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.story-card__bottom {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+}
+.story-card__progress {
+  font-size: 14px;
+  opacity: 0.94;
+}
+.story-card__cta {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+.story-card__bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.story-card__bar-fill {
+  height: 100%;
+  width: 0%;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: inherit;
+  transition: width 600ms var(--ease-out);
+}
+
+/* ─────────────────────────────  Story view  ───────────────────────────── */
+.view--story .topbar { gap: 12px; align-items: center; }
+.view--story .icon-btn { margin-left: 0; }
+.view--story .brand__name { font-size: 16px; font-weight: 600; }
+.story-stars {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.story { display: grid; gap: 14px; padding-top: 6px; }
+
+.story-worlds {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 2px 2px 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.story-worlds::-webkit-scrollbar { display: none; }
+.story-world-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  padding: 6px 12px 6px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 200ms var(--ease), color 200ms var(--ease);
+}
+.story-world-tab.is-active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: transparent;
+}
+.story-world-tab.is-locked { opacity: 0.4; cursor: default; }
+.story-world-tab__icon { font-size: 14px; }
+.story-world-tab__name { letter-spacing: -0.005em; }
+
+.story-world-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.story-world-head__title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.story-world-head__desc  { font-size: 13px; color: var(--text-soft); margin-top: 2px; }
+.story-world-head__badge {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* World map — alternating zig-zag of level nodes with a dashed spine. */
+.story-map {
+  --story-accent: var(--accent);
+  position: relative;
+  display: grid;
+  gap: 18px;
+  padding: 14px 0 28px;
+}
+.story-map::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 50%;
+  width: 0;
+  border-left: 2px dashed var(--border);
+  pointer-events: none;
+}
+.story-node {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px;
+  background: transparent;
+  border: 0;
+  width: 50%;
+  transition: transform 160ms var(--ease);
+}
+.story-node:active:not(.is-locked) { transform: scale(0.96); }
+.story-node--left  { justify-self: start; padding-left: 4px; }
+.story-node--right { justify-self: end;   padding-right: 4px; }
+.story-node--center { width: 100%; justify-self: stretch; }
+
+.story-node__circle {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--story-accent);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  font-variant-numeric: tabular-nums;
+  transition: transform 200ms var(--ease), filter 200ms var(--ease);
+}
+.story-node.is-locked .story-node__circle {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  box-shadow: none;
+  font-size: 22px;
+}
+.story-node.is-completed .story-node__circle {
+  filter: brightness(0.85);
+}
+.story-node__name {
+  font-size: 12px;
+  color: var(--text-soft);
+  text-align: center;
+  max-width: 110px;
+  line-height: 1.25;
+}
+.story-node.is-locked .story-node__name { color: var(--text-muted); }
+.story-node__stars {
+  display: inline-flex;
+  gap: 1px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.story-node__stars .is-on { color: #f59e0b; }
+.story-node__circle--boss {
+  width: 76px; height: 76px;
+  font-size: 32px;
+  border-radius: 22px;
+  background: var(--story-tint, var(--story-accent));
+  transform: rotate(0deg);
+}
+.story-node--boss { margin-top: 8px; }
+.story-node--boss .story-node__name { font-weight: 700; color: var(--text); }
+
+/* ─────────────────────────  Level intro sheet  ─────────────────────────── */
+.level-sheet__world {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 -8px;
+}
+.level-sheet__stars {
+  font-size: 20px;
+  color: #f59e0b;
+  letter-spacing: 4px;
+  margin: 2px 0 4px;
+}
+.level-sheet__objs {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.level-sheet__objs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+.level-sheet__objs li::before {
+  content: "·";
+  color: var(--accent);
+  font-weight: 700;
+}
+.level-sheet__actions {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* ─────────────────────────  In-game boss bar  ──────────────────────────── */
+.boss-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: -4px;
+}
+.boss-bar__avatar {
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  font-size: 20px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.boss-bar__main { display: grid; gap: 4px; min-width: 0; }
+.boss-bar__name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+.boss-bar__hp {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.boss-bar__hp-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--accent), #ef4444);
+  transition: width 320ms var(--ease-out);
+}
+.boss-bar__hp-fill.is-low { background: #ef4444; animation: bossLow 800ms var(--ease) infinite; }
+@keyframes bossLow {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+.boss-bar__lives {
+  display: inline-flex; align-items: center; gap: 2px;
+  color: #ef4444;
+  font-size: 16px;
+}
+.boss-bar__heart { line-height: 1; }
+
+/* Compact HUD for non-boss story levels. */
+.story-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  margin: -4px 0 -4px;
+}
+.story-hud__count {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.story-hud__lives {
+  display: inline-flex; gap: 2px;
+  color: #ef4444;
+  font-size: 13px;
+}
+.story-hud__heart { line-height: 1; }
+
+/* Story accent tint applied to the document during a story session.
+   It biases the question card and answer toward the world's accent. */
+:root[data-story-accent="0"] .question-card { box-shadow: 0 12px 32px rgba(34, 197, 94, 0.12), var(--shadow-md); }
+:root[data-story-accent="1"] .question-card { box-shadow: 0 12px 32px rgba(6, 182, 212, 0.14), var(--shadow-md); }
+:root[data-story-accent="2"] .question-card { box-shadow: 0 12px 32px rgba(236, 72, 153, 0.14), var(--shadow-md); }
+:root[data-story-accent="3"] .question-card { box-shadow: 0 12px 32px rgba(249, 115, 22, 0.14), var(--shadow-md); }
+:root[data-story-accent="4"] .question-card { box-shadow: 0 12px 32px rgba(251, 191, 36, 0.14), var(--shadow-md); }
+
 /* ────────────────────────────  Reduced motion  ─────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -67,6 +67,20 @@
       </header>
 
       <main class="home">
+        <button class="story-card" id="storyCard" type="button">
+          <div class="story-card__top">
+            <span class="story-card__title">Story</span>
+            <span class="story-card__world" id="storyWorldName">Grasslands</span>
+          </div>
+          <div class="story-card__bottom">
+            <span class="story-card__progress" id="storyProgressText">Level 1 of 8</span>
+            <span class="story-card__cta" id="storyCta">Continue →</span>
+          </div>
+          <div class="story-card__bar">
+            <div class="story-card__bar-fill" id="storyBarFill"></div>
+          </div>
+        </button>
+
         <button class="daily-card" id="dailyCard" type="button">
           <div class="daily-card__top">
             <span class="daily-card__title">Daily Challenge</span>
@@ -219,6 +233,21 @@
       </header>
 
       <main class="game">
+        <!-- Boss fight header. Hidden by default; shown by JS for story bosses. -->
+        <div class="boss-bar" id="bossBar" hidden>
+          <span class="boss-bar__avatar" id="bossAvatar">◆</span>
+          <div class="boss-bar__main">
+            <span class="boss-bar__name" id="bossName">Boss</span>
+            <div class="boss-bar__hp"><div class="boss-bar__hp-fill" id="bossHpFill"></div></div>
+          </div>
+          <span class="boss-bar__lives" id="bossLives"></span>
+        </div>
+        <!-- Story level HUD (non-boss): target + hearts. -->
+        <div class="story-hud" id="storyHud" hidden>
+          <span class="story-hud__count" id="storyHudCount">0 / 0</span>
+          <span class="story-hud__lives" id="storyHudLives"></span>
+        </div>
+
         <div class="question-card" id="questionCard">
           <div class="question" aria-live="polite">
             <span class="question__slot" id="qA">0</span>
@@ -354,6 +383,41 @@
         <ul class="ach-list" id="achList"></ul>
       </main>
     </section>
+
+    <!-- ─────────────────────────────  STORY  ───────────────────────────── -->
+    <section class="view view--story" data-view="story" hidden aria-label="Story">
+      <header class="topbar">
+        <button class="icon-btn" id="storyBackBtn" aria-label="Back" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <span class="brand__name">Adventure</span>
+        <span class="story-stars" id="storyStars">★ 0 / 0</span>
+      </header>
+      <main class="story">
+        <div class="story-worlds" id="storyWorldTabs" role="tablist" aria-label="Worlds"></div>
+        <div class="story-world-head" id="storyWorldHead"></div>
+        <div class="story-map" id="storyMap"></div>
+      </main>
+    </section>
+
+    <!-- ────────────────────────  LEVEL INTRO SHEET  ────────────────────── -->
+    <div class="sheet" id="levelSheet" hidden aria-hidden="true">
+      <div class="sheet__scrim" data-sheet-close></div>
+      <div class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="levelSheetTitle">
+        <div class="sheet__handle" aria-hidden="true"></div>
+        <p class="level-sheet__world" id="levelSheetWorld">Grasslands</p>
+        <h3 class="sheet__title" id="levelSheetTitle">Level</h3>
+        <div class="level-sheet__stars" id="levelSheetStars">☆☆☆</div>
+        <ul class="level-sheet__objs" id="levelSheetObjs"></ul>
+        <div class="level-sheet__actions">
+          <button class="btn btn--ghost" type="button" data-sheet-close>Cancel</button>
+          <button class="btn btn--primary" id="levelSheetStart" type="button">Start</button>
+        </div>
+      </div>
+    </div>
 
     <!-- ───────────────────────────  ONBOARDING  ────────────────────────── -->
     <section class="view view--onboard" data-view="onboard" hidden aria-label="Welcome">

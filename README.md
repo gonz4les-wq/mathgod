@@ -44,6 +44,28 @@ Selectable from the segmented control on the home screen:
 Each summary shows correct / time / best streak / XP, and a "new personal
 best" badge whenever you beat the relevant record.
 
+## Story mode
+
+Tap the **Story** card on the home screen to enter the adventure. Five
+themed worlds — *Grasslands*, *Ice Caverns*, *Neon City*, *Volcano Core*,
+*Sky Kingdom* — each contain eight levels and a boss fight. Levels have a
+fixed correct-answer target and a limited number of lives; bosses run on a
+60 s timer with an HP bar that you chip down on every correct answer
+(combo crits deal extra damage). Wrong answers cost a life. Star ratings
+(1–3 ★) are based on mistakes for normal levels and on remaining time for
+bosses. Defeating a boss unlocks the next world.
+
+## Player level and shop
+
+Total XP fills a level bar in the topbar — each session adds XP, and the
+level shown reflects the cumulative curve `25·L·(L+1)`. The **Shop** icon
+opens an XP-only cosmetics store with five tabs: Themes, Numbers, Card,
+Particles, Keypad. Eighteen items spread across common / rare / epic /
+legendary tiers, all owned items can be equipped, and changes apply
+instantly. At level 25 a **Prestige** tile becomes available — reset XP
+for a permanent +5 % multiplier; cosmetics, achievements and story
+progress are preserved across prestiges.
+
 ## Run locally
 
 The app is plain static files — any local web server works. From the repo root:
