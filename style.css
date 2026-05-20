@@ -92,6 +92,10 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   height: 100%;
+  /* Lock horizontal scroll for the whole app. `clip` (not `hidden`) avoids
+     turning the root into a scroll container, which would interfere with
+     position:fixed elements and iOS momentum scrolling. */
+  overflow-x: clip;
 }
 body {
   font-family: var(--font);
@@ -107,7 +111,10 @@ body {
   background-image:
     radial-gradient(120% 80% at 0% 0%, var(--accent-soft), transparent 60%);
   background-attachment: fixed;
-  overscroll-behavior: none;
+  /* Keep iOS rubber-band bounce vertically (feels native), block horizontal. */
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
+  overflow-x: clip;
 }
 button {
   font: inherit;
@@ -136,6 +143,8 @@ ul { padding: 0; list-style: none; }
     calc(var(--safe-right))
     calc(var(--safe-bottom))
     calc(var(--safe-left));
+  /* Defence in depth: also clip horizontally here. */
+  overflow-x: clip;
 }
 .view {
   display: grid;
@@ -145,6 +154,8 @@ ul { padding: 0; list-style: none; }
   margin: 0 auto;
   padding: 12px 20px 24px;
   animation: viewIn 360ms var(--ease-out) both;
+  /* Block accidental child overflow from triggering a sideways scrollbar. */
+  min-width: 0;
 }
 [hidden] { display: none !important; }
 
@@ -157,15 +168,18 @@ ul { padding: 0; list-style: none; }
 .topbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 10px 2px 16px;
+  min-width: 0;
 }
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-weight: 600;
   letter-spacing: -0.01em;
+  flex-shrink: 0;
+  min-width: 0;
 }
 .brand__mark {
   width: 22px; height: 22px;
@@ -188,7 +202,7 @@ ul { padding: 0; list-style: none; }
 .brand__name { font-size: 15px; }
 
 .icon-btn {
-  width: 38px; height: 38px;
+  width: 36px; height: 36px;
   display: inline-grid; place-items: center;
   border-radius: 12px;
   background: var(--surface);
@@ -203,21 +217,23 @@ ul { padding: 0; list-style: none; }
 .icon-btn:hover { background: var(--surface-2); }
 
 /* Player level chip — small "Lv 3" + a thin progress bar to the next level.
-   Lives between the brand and the icon buttons; gracefully hides on tight
-   screens by truncating the bar (the number stays). */
+   Lives between the brand and the icon buttons; gracefully shrinks on narrow
+   screens (the bar is the first thing to shrink, then disappear). */
 .level-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 28px;
-  padding: 0 10px 0 10px;
+  padding: 0 10px;
   border-radius: 999px;
   background: var(--surface);
   border: 1px solid var(--border);
-  margin-left: 10px;
+  margin-left: 6px;
   margin-right: auto;
   font-variant-numeric: tabular-nums;
   transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
+  flex-shrink: 1;
+  min-width: 0;
 }
 .level-badge.bump {
   animation: levelBump 600ms var(--ease-out);
@@ -234,10 +250,12 @@ ul { padding: 0; list-style: none; }
   color: var(--accent);
 }
 .level-badge__bar {
-  width: 56px; height: 4px;
+  width: 48px; height: 4px;
   background: var(--surface-2);
   border-radius: 999px;
   overflow: hidden;
+  flex-shrink: 1;
+  min-width: 16px;
 }
 .level-badge__fill {
   height: 100%;
@@ -246,8 +264,15 @@ ul { padding: 0; list-style: none; }
   border-radius: inherit;
   transition: width 600ms var(--ease-out);
 }
+/* Drop the bar entirely on the tightest screens — the level number is the
+   important part. Brand name shrinks too. */
 @media (max-width: 380px) {
-  .level-badge__bar { width: 36px; }
+  .topbar { gap: 8px; }
+  .level-badge { padding: 0 8px; gap: 6px; }
+  .level-badge__bar { display: none; }
+}
+@media (max-width: 340px) {
+  .brand__name { display: none; }
 }
 /* Sun/moon swap: sun visible in light, moon in dark. data-theme overrides. */
 .icon-sun, .icon-moon { transition: opacity 200ms var(--ease); }
@@ -1622,8 +1647,10 @@ ul { padding: 0; list-style: none; }
 
 /* ─────────────────────────  Story hero card  ──────────────────────────── */
 .story-card {
-  --story-tint: linear-gradient(160deg, var(--accent), #8b5cf6);
-  --story-accent: var(--accent);
+  /* Default to the Grasslands tint — matches a new user's starting world,
+     which prevents a colour flash between paint and JS execution. */
+  --story-tint: linear-gradient(160deg, #22c55e, #65a30d);
+  --story-accent: #16a34a;
   display: grid;
   gap: 6px;
   text-align: left;
@@ -1636,6 +1663,8 @@ ul { padding: 0; list-style: none; }
   position: relative;
   overflow: hidden;
   transition: transform 200ms var(--ease);
+  width: 100%;
+  min-width: 0;
 }
 .story-card:active { transform: scale(0.985); }
 .story-card__top {

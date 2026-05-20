@@ -988,13 +988,16 @@
       btn.classList.toggle("is-active", btn.dataset.cat === shopCategory);
       btn.setAttribute("aria-selected", btn.dataset.cat === shopCategory ? "true" : "false");
     });
-    // Items in this category, sorted by rarity then price (defaults last).
-    const items = ITEMS
+    // Items in this category, sorted by rarity then price. The default
+    // (price 0) is always pinned first so the user can revert at any time.
+    const def  = ITEMS.find((it) => it.category === shopCategory && it.price === 0);
+    const paid = ITEMS
       .filter((it) => it.category === shopCategory && it.price > 0)
       .slice()
       .sort((a, b) =>
         (RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]) || (a.price - b.price)
       );
+    const items = def ? [def, ...paid] : paid;
     dom.shopGrid.innerHTML = "";
     for (const it of items) {
       dom.shopGrid.appendChild(buildShopCard(it));
