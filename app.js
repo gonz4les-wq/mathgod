@@ -871,7 +871,7 @@
     if (!dom.levelBadge) return;
     const lp = levelProgress();
     const prestige = store.player?.prestige || 0;
-    dom.levelNum.textContent = prestige > 0 ? `★${prestige} · Lv ${lp.level}` : `Lv ${lp.level}`;
+    dom.levelNum.textContent = prestige > 0 ? `★${prestige} · ${lp.level}` : String(lp.level);
     dom.levelFill.style.width = (lp.pct * 100) + "%";
     if (opts.bump) {
       dom.levelBadge.classList.remove("bump");

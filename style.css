@@ -258,10 +258,15 @@ ul { padding: 0; list-style: none; }
   100% { transform: scale(1); box-shadow: 0 0 0 0 var(--accent-soft); }
 }
 .level-badge__num {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   color: var(--accent);
+  /* Reserve space for at least two digits so the chip width stays steady
+     when crossing 10/100, eliminating the "offset" feel. */
+  min-width: 1.4ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 .level-badge__bar {
   width: 48px; height: 4px;
@@ -1393,31 +1398,46 @@ ul { padding: 0; list-style: none; }
 .shop { display: grid; gap: 16px; padding-top: 8px; }
 .shop-tabs {
   display: flex;
-  gap: 6px;
+  gap: 2px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: 0 4px 4px;
+  padding: 0 2px 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
 }
 .shop-tabs::-webkit-scrollbar { display: none; }
+/* Tabs keep the same shape and size on every state — only the text colour
+   shifts and a thin accent underline indicates the active tab. */
 .shop-tab {
   flex-shrink: 0;
   scroll-snap-align: start;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.005em;
-  padding: 7px 14px;
+  padding: 10px 14px 10px;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  position: relative;
+  transition: color 200ms var(--ease);
+}
+.shop-tab::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: -1px;
+  height: 2px;
   border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text-soft);
-  transition: background 200ms var(--ease), color 200ms var(--ease);
+  background: transparent;
+  transition: background 200ms var(--ease);
 }
 .shop-tab.is-active {
-  background: var(--text);
-  color: var(--bg);
-  border-color: transparent;
+  color: var(--text);
+}
+.shop-tab.is-active::after {
+  background: var(--accent);
 }
 
 .shop-grid {
